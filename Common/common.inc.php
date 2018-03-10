@@ -26,17 +26,22 @@ function rand_string( $length ) {
 function getLoggedUser() {
     global $config;
     if (isset($_POST)&&(isset($_POST["jwt"])||(isset($_POST["username"])&&isset($_POST["password"])))) {
-        $token = $_POST["jwt"];
+        $token=null;
+        if (array_key_exists("jwt",$_POST)&&$_POST["jwt"]=!"") {
+            $token = $_POST["jwt"];
+        }
+
         if ($token == null) {
-            if (isset($_POST["username"])&&isset($_POST["password"]) {
+            if (isset($_POST["username"])&&isset($_POST["password"])) {
                 $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
+                $users=array();
                 if (file_exists($config["usersFile"]))
                     $configContent=file_get_contents($config["usersFile"]);
-                if ($configContent!=null&&$configContent!="") {
-                    $this->users = json_decode($configContent, true);
+                if (isset($configContent)&&$configContent!=null&&$configContent!="") {
+                    $users = json_decode($configContent, true);
                 }
 
-                foreach ($this->users as $user) {
+                foreach ($users as $user) {
                     if ($username == $user["username"]) {
                         if ($this->generatePasswordHash($_POST["password"])==$user["password"]) {
                             return $user;

@@ -9,12 +9,8 @@ class Router {
         $this->request = $request;
     }
     public function get($route, $controller, $action){
-
-        $uri = trim( $this->request, "/" );
-        $uri = explode("/", $uri);
-        if(is_array($uri)&&isset($uri[1])&&isset($uri[2])&&$uri[1]."/".$uri[2] == trim($route, "/")){
-            //array_shift($uri);
-            //$args = $uri;
+        $allowedActions=array("auth","getSummary","getPools","getType","getNetwork","getOverview","updatePools","updatePassword","updateNetwork","ping","reboot");
+        if(isset($_GET)&&array_key_exists("action",$_GET)&&$_GET["action"]!=""&&in_array($_GET["action"],$allowedActions)) {
             if (file_exists(__DIR__."/../Controller/".$controller . 'Controller.php')) {
                 require __DIR__."/../Controller/".$controller . 'Controller.php';
                 $controllerClass = $controller."Controller";
