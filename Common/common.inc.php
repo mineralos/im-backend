@@ -8,13 +8,14 @@ function get_jwt_key() {
     $content=null;
     if (file_exists($config["jwtKeyFile"]))
         $content=file_get_contents($config["jwtKeyFile"]);
-    if ($content!=null&&$content!="") {
-        return $content;
-    } else {
+
+    if ($content==null||$content=="") {
         $key=rand_string(20);
         file_put_contents($config["jwtKeyFile"],$key);
         return $key;
     }
+
+    return $content;
 }
 
 function rand_string( $length ) {
@@ -27,7 +28,7 @@ function getLoggedUser() {
     global $config;
     if (isset($_POST)&&(isset($_POST["jwt"])||(isset($_POST["username"])&&isset($_POST["password"])))) {
         $token=null;
-        if (array_key_exists("jwt",$_POST)&&$_POST["jwt"]=!"") {
+        if (array_key_exists("jwt",$_POST)&&$_POST["jwt"]!="") {
             $token = $_POST["jwt"];
         }
 
@@ -44,7 +45,7 @@ function getLoggedUser() {
                 foreach ($users as $user) {
                     if ($username == $user["username"]) {
                         if (generatePasswordHash($_POST["password"])==$user["password"]) {
-                            return $user;
+                            return $user["username"];
                         } else {
                             return null;
                         }
