@@ -43,7 +43,7 @@ function getLoggedUser() {
 
                 foreach ($users as $user) {
                     if ($username == $user["username"]) {
-                        if ($this->generatePasswordHash($_POST["password"])==$user["password"]) {
+                        if (generatePasswordHash($_POST["password"])==$user["password"]) {
                             return $user;
                         } else {
                             return null;
@@ -75,4 +75,9 @@ function mask2cidr($mask){
     $long = ip2long($mask);
     $base = ip2long('255.255.255.255');
     return 32-log(($long ^ $base)+1,2);
+}
+
+function generatePasswordHash($password) {
+    global $config;
+    return hash('sha256', $config["salt"].$password);
 }

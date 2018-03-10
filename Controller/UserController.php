@@ -16,7 +16,7 @@ class UserController {
         }
         if ($this->users === null || json_last_error() !== JSON_ERROR_NONE) {
 
-            $this->users=array(array("username"=>$config["userAdmin"],"password"=>$this->generatePasswordHash($config["passwordAdmin"])),array("username"=>$config["userGuest"],"password"=>$this->generatePasswordHash($config["passwordGuest"])));
+            $this->users=array(array("username"=>$config["userAdmin"],"password"=>generatePasswordHash($config["passwordAdmin"])),array("username"=>$config["userGuest"],"password"=>generatePasswordHash($config["passwordGuest"])));
             $this->save();
         }
 
@@ -29,7 +29,7 @@ class UserController {
             $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
             foreach ($this->users as $user) {
                 if ($username==$user["username"]) {
-                    if ($this->generatePasswordHash($_POST["password"])==$user["password"]) {
+                    if (generatePasswordHash($_POST["password"])==$user["password"]) {
                         //Valid Password
                         $key = get_jwt_key();
                         $now=time();
@@ -63,7 +63,7 @@ class UserController {
         if (isset($_POST["currentPassword"]) &&$_POST["currentPassword"]!="") {
             foreach ($this->users as $user) {
                 if ($config["userAdmin"] == $user["username"]) {
-                    if ($this->generatePasswordHash($_POST["currentPassword"]) == $user["password"]) {
+                    if (generatePasswordHash($_POST["currentPassword"]) == $user["password"]) {
                         $validPassword=true;
                     }
                     break;
@@ -87,7 +87,7 @@ class UserController {
 
         foreach ($this->users as $user) {
             if ($_POST["user"] == $user["username"]) {
-                $this->users[$userPos]["password"]=$this->generatePasswordHash($_POST["newPassword"]);
+                $this->users[$userPos]["password"]=generatePasswordHash($_POST["newPassword"]);
                 $updatedPassword=true;
                 break;
             }
@@ -113,10 +113,7 @@ class UserController {
         file_put_contents($config["usersFile"],json_encode($this->users,JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
     }
 
-    private function generatePasswordHash($password) {
-        global $config;
-        return hash('sha256', $config["salt"].$password);
-    }
+
 
 }
 
