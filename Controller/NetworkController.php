@@ -33,7 +33,10 @@ class NetworkController {
         }
 
         if ($_POST["dhcp"]=="dhcp") {
-            $fileContent="auto eth0\niface eth0 inet dhcp\n";
+            $fileContent="[Match]\n";
+            $fileContent.="Name=eth0\n";
+            $fileContent.="[Network]\n";
+            $fileContent.="DHCP=ipv4\n";
             file_put_contents($config["interfacesFile"],$fileContent);
             echo json_encode(array("success"=>true));
         } else if ($_POST["dhcp"]=="static"){
@@ -57,11 +60,12 @@ class NetworkController {
                 echo json_encode(array("success"=>false,"message"=>"invalid dns 2 "));
                 return;
             }
-            $fileContent="auto eth0\n";
-            $fileContent.="iface eth0 inet static\n";
-            $fileContent.="address ".$_POST["ipaddress"]."\n";
-            $fileContent.="netmask ".$_POST["netmask"]."\n";
-            $fileContent.="gateway ".$_POST["gateway"]."\n";
+            $fileContent="[Match]\n";
+            $fileContent.="Name=eth0\n";
+            $fileContent.="[Network]\n";
+            $fileContent.="Address=".$_POST["ipaddress"]."\/".mask2cidr($_POST["netmask"])."\n";
+            $fileContent.="Gateway=".$_POST["gateway"]."\n";
+
             file_put_contents($config["interfacesFile"],$fileContent);
 
             $fileContentDns="nameserver ".$_POST["dns"][0]."\n";
@@ -76,18 +80,7 @@ class NetworkController {
     }
 
     private function restartNetwork() {
-        global $config;
-        exec('ifdown -f eth0');
-        sleep(1);
-        if (file_exists($config["dhcpPidFile"])) {
-            $pid = trim(file_get_contents($config["dhcpPidFile"]));
-            if (intval($pid)>0) {
-                exec('kill '.$pid);
-                unlink($config["dhcpPidFile"]);
-                sleep(1);
-            }
-        }
-        exec('ifup eth0');
+        exec('systemctl restart systemd-networkd');
     }
 
 

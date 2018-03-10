@@ -16,6 +16,7 @@ class ConfigController {
 
     public function getPoolsAction() {
         header('Content-Type: application/json');
+        /*
         $keysNeeded=array("Pool","UserName","Password");
         $pools=array();
         for ($i=1;$i<=3;$i++) {
@@ -24,34 +25,41 @@ class ConfigController {
                 if (array_key_exists($key . $i, $this->config)&&!is_null($this->config[$key . $i])&&$this->config[$key . $i]!="") {
                     $val=($key=="Pool"?stripcslashes($this->config[$key . $i]):$this->config[$key . $i]);
                 }
-                $pools[$key . $i] = $val;
+
             }
         }
-        echo json_encode(array("success"=>true,"pools"=>$pools),JSON_UNESCAPED_SLASHES);
+        */
+        echo json_encode(array("success"=>true,"pools"=>$this->config["pools"]),JSON_UNESCAPED_SLASHES);
     }
 
     public function updatePoolsAction() {
         header('Content-Type: application/json');
+
         $keysNeeded=array("Pool","UserName","Password");
+        $newKeys=array("Pool","UserName","Password");
         $numPools=0;
+        $pools=array();
         for ($i=1;$i<=3;$i++) {
-            foreach ($keysNeeded as $key) {
+            $pool=array();
+            foreach ($keysNeeded as $j=>$key) {
                 $val=null;
                 if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="") {
                     $val=$_POST[$key . $i];
                 }
+                $pool[$newKeys[$j]]=$val;
                 $this->config[$key . $i] = $val;
             }
-            if ($this->config["Pool" . $i]!=""&&$this->config["UserName" . $i]!=""&&$this->config["Password" . $i]!="") {
-                $numPools++;
-            }
+            $pools[]=$pool;
         }
-        $this->config["PoolNum"]=(string)$numPools;
+        $this->config["pools"]=$pools;
         if (is_null($this->save())) {
             echo json_encode(array("success"=>false,"message"=>"reboot manually"));
         } else {
             echo json_encode(array("success"=>true));
         }
+
+
+
     }
 
     private function save() {
@@ -62,7 +70,7 @@ class ConfigController {
 
         //Shutdown CgMiner
         $service = new CgminerService();
-        $response=$service->call("powerdown",3);
+        $response=$service->call("systemctl restart cgminer.service",3);
         return ($response==null);
     }
 

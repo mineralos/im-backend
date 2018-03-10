@@ -11,8 +11,8 @@ class MinerController {
 
     private  function getType() {
         global $config;
-        $type=trim(file_get_contents($config["typeFile"]));
-        $typeNum=15+intval($type[1]);
+        $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
+        $typeNum=15+intval($hardwareVersion[1]);
         return $typeNum;
     }
 
@@ -72,12 +72,12 @@ class MinerController {
         }
 
         //Version
-        $buildContent=@file($config["buildLogFile"]);
-        $hardwareVersion=str_replace("\n","",@file_get_contents($config["hardwareVersionFile"]));
-        $macAddress=exec('fw_printenv ethaddr | awk -F \'=\' \'{ print $2 }\'');
-        $buildDate=trim($buildContent[2]);
-        $plarformVersion=trim(explode(",",$buildContent[20])[0]);
-        $rootFsVersion=trim(explode(",",$buildContent[24])[0]);
+        $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
+        $macAddress=exec('cat /sys/class/net/eth0/address');
+        $buildContent=parse_ini_file($config["buildFile"]);
+        $buildDate=$buildContent["VERSION_ID"];
+        $plarformVersion=$buildContent["VERSION"];
+
 
         echo json_encode(array(
             "success"=>true,
@@ -101,8 +101,7 @@ class MinerController {
                 "hwver"=>$hardwareVersion,
                 "ethaddr"=>$macAddress,
                 "build_date"=>$buildDate,
-                "platform_v"=>$plarformVersion,
-                "rootfs_v"=>$rootFsVersion
+                "platform_v"=>$plarformVersion
             )
         ));
 

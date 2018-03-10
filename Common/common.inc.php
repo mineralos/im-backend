@@ -24,9 +24,29 @@ function rand_string( $length ) {
 
 
 function getLoggedUser() {
-    if (isset($_POST)&&isset($_POST["jwt"])) {
+    global $config;
+    if (isset($_POST)&&(isset($_POST["jwt"])||(isset($_POST["username"])&&isset($_POST["password"])))) {
         $token = $_POST["jwt"];
-        if ($token != null) {
+        if ($token == null) {
+            if (isset($_POST["username"])&&isset($_POST["password"]) {
+                $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
+                if (file_exists($config["usersFile"]))
+                    $configContent=file_get_contents($config["usersFile"]);
+                if ($configContent!=null&&$configContent!="") {
+                    $this->users = json_decode($configContent, true);
+                }
+
+                foreach ($this->users as $user) {
+                    if ($username == $user["username"]) {
+                        if ($this->generatePasswordHash($_POST["password"])==$user["password"]) {
+                            return $user;
+                        } else {
+                            return null;
+                        }
+                    }
+                }
+            }
+        } else {
             try {
                 $decoded = JWT::decode($token, get_jwt_key(), array('HS256'));
                 return $decoded->user;
@@ -43,4 +63,11 @@ function isValidIp($ip) {
         return true;
     }
     return false;
+}
+
+
+function mask2cidr($mask){
+    $long = ip2long($mask);
+    $base = ip2long('255.255.255.255');
+    return 32-log(($long ^ $base)+1,2);
 }
