@@ -3,7 +3,6 @@
 
 class NetworkController {
 
-
     public function getNetworkAction() {
         global $config;
         header('Content-Type: application/json');

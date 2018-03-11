@@ -4,6 +4,7 @@ include __DIR__.'/Common/common.inc.php';
 include __DIR__.'/Config/config.inc.php';
 include __DIR__.'/Helper/Router.php';
 include __DIR__.'/Service/CgminerService.php';
+include __DIR__.'/Service/SWUpdateService.php';
 require_once('vendor/autoload.php');
 
 
@@ -67,6 +68,10 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Reboot
     if (!$found)
         $found=$router->get('/api/reboot', 'Miner',"reboot");
+
+    //SWUpdate progress
+    if (!$found)
+        $found=$router->get('/api/upgrade', 'Miner',"upgrade");
 }
 
 

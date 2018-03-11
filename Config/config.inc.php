@@ -23,4 +23,9 @@ $config["passwordGuest"]="dragonguest";
 //Versions
 $config["hardwareVersionFile"]="/etc/hwrevision";
 
+//Update
+$config["swUpdateProgressSocket"]="unix:///tmp/swupdateprog";
+$config["swUpdateMaxFileSize"]=100*1024*1024;//100Mb
+$config["swUpdateImagePath"]="/tmp/update.swu";
+
 ?>

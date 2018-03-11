@@ -1,8 +1,9 @@
 <?php
 
-
+use DragonMint\Service\SWUpdateService;
 
 class MinerController {
+
 
 
     public function __construct(){
@@ -99,6 +100,65 @@ class MinerController {
         ));
 
     }
+
+    public function upgradeAction() {
+        global $config;
+
+        if (
+            !isset($_FILES['upfile']['error']) ||
+            is_array($_FILES['upfile']['error'])
+        ) {
+            echo json_encode(array("result"=>false,"message"=>"No upgrade file"));
+            return;
+        }
+
+        // Check $_FILES['upfile']['error'] value.
+        $error="";
+        switch ($_FILES['upfile']['error']) {
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $error="No file sent";
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $error="Exceeded filesize limit.";
+            default:
+                $error="'Unknown errors";
+        }
+
+        if ($error!="") {
+            echo json_encode(array("result"=>false,"message"=>$error));
+            return;
+        }
+
+        // You should also check filesize here.
+        if ($_FILES['upfile']['size'] > $config["swUpdateMaxFileSize"]) {
+            $error="Exceeded filesize limit.";
+            echo json_encode(array("result"=>false,"message"=>$error));
+            return;
+        }
+
+        $ext=pathinfo( $_FILES['upfile']['name'], PATHINFO_EXTENSION);
+        if (strtolower($ext)!="swu") {
+            echo json_encode(array("result"=>false,"message"=>"Invalid file format"));
+            return;
+        }
+
+
+        if (!move_uploaded_file(
+            $_FILES['upfile']['tmp_name'],
+            $config["swUpdateImagePath"]
+        )) {
+            echo json_encode(array("result"=>false,"message"=>"Failed to move uploaded file."));
+            return;
+        }
+        echo json_encode(array("success"=>true));
+
+
+
+    }
+
+
 
 }
 
