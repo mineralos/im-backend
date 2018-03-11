@@ -42,7 +42,8 @@ class ConfigController {
                 }
                 $pool[$newKeys[$j]]=$val;
             }
-            $pools[]=$pool;
+            if ($pool["url"]!=""&&$pool["user"]!=""&&$pool["pass"]!="")
+                $pools[]=$pool;
         }
         $this->config["pools"]=$pools;
         if (is_null($this->save())) {

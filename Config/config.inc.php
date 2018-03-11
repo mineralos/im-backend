@@ -9,8 +9,8 @@ $config["jwtTokenExpire"]=21600; //6 hours
 $config["serverName"]="DragonMint";
 $config["salt"]="8985dee0f2bc1b7a895d58bc4811e373";
 
-
-$config["interfacesFile"]="/config/network/25-wired.network";
+$config["interfacesDirectory"]="/config/network/";
+$config["interfacesFile"]="25-wired.network";
 $config["resolvFile"]="/etc/resolv.conf";
 #$config["dhcpPidFile"]="/var/run/udhcpc.eth0.pid";
 

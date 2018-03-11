@@ -58,27 +58,7 @@ class MinerController {
             }
         }
 
-        //Network
-        $networkFileParsed=@parse_ini_file($config["interfacesFile"]);
-        $dhcp="static";
-        if ($networkFileParsed!=null) {
-            if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == "ipv4") {
-                $dhcp = "dhcp";
-            }
-        }
-        $ip   = exec("ifconfig | grep inet | sed -n '1p' | awk '{print $2}' | awk -F ':' '{print $2}'");
-        $netmask= exec("ifconfig |grep inet| sed -n '1p'|awk '{print $4}'|awk -F ':' '{print $2}'");
-        $gw = exec("route -n | grep eth0 | grep UG | awk '{print $2}'");
-        $dns=array();
-        if (file_exists($config["resolvFile"])) {
-            $dnsContent = file($config["resolvFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($dnsContent as $item) {
-                $dnsParts=explode("nameserver ",$item);
-                if(isset($dnsParts[1])) {
-                    $dns[]=trim($dnsParts[1]);
-                }
-            }
-        }
+
 
         //Version
         $version="undefined";
@@ -95,6 +75,8 @@ class MinerController {
         $buildDate=$buildContent["VERSION_ID"];
         $plarformVersion=$buildContent["VERSION"];
 
+        //Network
+        $network=getNetwork();
 
         echo json_encode(array(
             "success"=>true,
@@ -107,13 +89,7 @@ class MinerController {
                 "cacheUsed"=>$memCached,
                 "cacheFree"=>$memCachedFree,
                 "cacheTotal"=>$memCachedFree+$memCached),
-            "network"=>array(
-                "dhcp"=>$dhcp,
-                "ipaddress"=>$ip,
-                "netmask"=>$netmask,
-                "gateway"=>$gw,
-                "dns1"=>$dns[0],
-                "dns2"=>$dns[1]),
+            "network"=>$network,
             "version"=>array(
                 "hwver"=>$hardwareVersion,
                 "ethaddr"=>$macAddress,

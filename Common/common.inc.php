@@ -23,18 +23,53 @@ function rand_string( $length ) {
     return substr(str_shuffle($chars),0,$length);
 }
 
+function getNetwork() {
+    global $config;
+    $networkFileParsed=@parse_ini_file($config["interfacesDirectory"].$config["interfacesFile"]);
+    $dhcp="dhcp";
+    if ($networkFileParsed!=null) {
+        if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == "ipv4") {
+            $dhcp = "dhcp";
+        } else {
+            $dhcp = "static";
+        }
+    }
+    $ip   = exec("ifconfig | grep inet | sed -n '1p' | awk '{print $2}' | awk -F ':' '{print $2}'");
+    $netmask= exec("ifconfig |grep inet| sed -n '1p'|awk '{print $4}'|awk -F ':' '{print $2}'");
+    $gw = exec("route -n | grep eth0 | grep UG | awk '{print $2}'");
+    $dns[0]="";
+    $dns[1]="";
+    if (file_exists($config["resolvFile"])) {
+        $dnsContent = file($config["resolvFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $i=0;
+        foreach ($dnsContent as $item) {
+            $dnsParts=explode("nameserver ",$item);
+            if(isset($dnsParts[1])) {
+                $dns[$i]=trim($dnsParts[1]);
+                $i++;
+            }
+        }
+    }
+    return array(
+        "dhcp"=>$dhcp,
+        "ipaddress"=>$ip,
+        "netmask"=>$netmask,
+        "gateway"=>$gw,
+        "dns1"=>$dns[0],
+        "dns2"=>$dns[1]);
+}
 
 function getLoggedUser() {
     global $config;
-    if (isset($_POST)&&(isset($_POST["jwt"])||(isset($_POST["username"])&&isset($_POST["password"])))) {
+    if (isset($_POST)&&(isset($_POST["jwt"])||(isset($_SERVER['PHP_AUTH_USER'])&&isset($_SERVER['PHP_AUTH_USER'])&&isset($_SERVER['PHP_AUTH_PW'])))) {
         $token=null;
         if (array_key_exists("jwt",$_POST)&&$_POST["jwt"]!="") {
             $token = $_POST["jwt"];
         }
 
-        if ($token == null) {
-            if (isset($_POST["username"])&&isset($_POST["password"])) {
-                $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
+        if ($token == null&&isset($_SERVER['PHP_AUTH_USER'])) {
+            if (isset($_SERVER['PHP_AUTH_USER'])&&isset($_SERVER['PHP_AUTH_PW'])) {
+                $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_SERVER['PHP_AUTH_USER']);
                 $users=array();
                 if (file_exists($config["usersFile"]))
                     $configContent=@file_get_contents($config["usersFile"]);
@@ -44,7 +79,7 @@ function getLoggedUser() {
 
                 foreach ($users as $user) {
                     if ($username == $user["username"]) {
-                        if (generatePasswordHash($_POST["password"])==$user["password"]) {
+                        if (generatePasswordHash($_SERVER['PHP_AUTH_PW'])==$user["password"]) {
                             return $user["username"];
                         } else {
                             return null;
@@ -81,4 +116,8 @@ function mask2cidr($mask){
 function generatePasswordHash($password) {
     global $config;
     return hash('sha256', $config["salt"].$password);
+}
+function cleanWorker($string) {
+    $string = str_replace(' ', '-', $string);
+    return preg_replace('/[^A-Za-z0-9\-\.\_]/', '', $string);
 }

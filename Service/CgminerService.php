@@ -68,10 +68,14 @@ class CgminerService {
 
                 if (strlen($line) == 0)
                 {
-                    return $line;
+                    return null;
                 }
-                if (substr($line,0,1) == '{')
+
+                if (substr($line,0,1) == '{') {
+                    $line=preg_replace('/[^(\x20-\x7F)]*/','', $line);
                     return json_decode($line, true);
+
+                }
             }
 
         } catch(\Exception $e) {

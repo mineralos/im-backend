@@ -4,14 +4,28 @@ use DragonMint\Service\CgminerService;
 
 class StatusController {
 
+
     public function getSummaryAction() {
         $service = new CgminerService();
         header('Content-Type: application/json');
-        $response=$service->call("pools+devs");
+        $response=$service->call("pools+devs+stats");
         $devs=@$response["devs"][0]["DEVS"];
+        //look for the fans speed
+        $fansSpeed=0;
+
+        for ($i=0;$i<3;$i++) {
+            if (array_key_exists($i,$response["stats"][0]["STATS"])) {
+                $stats = $response["stats"][0]["STATS"][$i];
+                if (intval($stats["Fan duty"]) > 0) {
+                    $fansSpeed = intval($stats["Fan duty"]);
+                    break;
+                }
+            }
+        }
+
         $pools=@$response["pools"][0]["POOLS"];
         if (is_array($devs)&&is_array($pools)) {
-            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools));
+            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools, "HARDWARE"=>array("Fan duty"=>$fansSpeed)));
         } else {
             echo json_encode(array("success" => false));
         }
