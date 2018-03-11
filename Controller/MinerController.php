@@ -59,7 +59,13 @@ class MinerController {
         }
 
         //Network
-        $dhcp=exec('cat '.$config["interfacesFile"].'| grep ^iface | sed -n \'$p\' | awk \'{print $4}\'');
+        $networkFileParsed=@parse_ini_file($config["interfacesFile"]);
+        $dhcp="static";
+        if ($networkFileParsed!=null) {
+            if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == "ipv4") {
+                $dhcp = "dhcp";
+            }
+        }
         $ip   = exec("ifconfig | grep inet | sed -n '1p' | awk '{print $2}' | awk -F ':' '{print $2}'");
         $netmask= exec("ifconfig |grep inet| sed -n '1p'|awk '{print $4}'|awk -F ':' '{print $2}'");
         $gw = exec("route -n | grep eth0 | grep UG | awk '{print $2}'");
@@ -67,14 +73,10 @@ class MinerController {
         if (file_exists($config["resolvFile"])) {
             $dnsContent = file($config["resolvFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($dnsContent as $item) {
-                if ($item[0] === '#') continue;
                 $dnsParts=explode("nameserver ",$item);
-                if (count($dnsParts)>1) {
+                if(isset($dnsParts[1])) {
                     $dns[]=trim($dnsParts[1]);
-                } else {
-                    $dns[]="";
                 }
-
             }
         }
 

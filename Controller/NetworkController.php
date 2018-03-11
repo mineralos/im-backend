@@ -8,8 +8,14 @@ class NetworkController {
         global $config;
         header('Content-Type: application/json');
 
+        $networkFileParsed=@parse_ini_file($config["interfacesFile"]);
+        $dhcp="static";
+        if ($networkFileParsed!=null) {
 
-        $dhcp=exec('cat '.$config["interfacesFile"].'| grep ^iface | sed -n \'$p\' | awk \'{print $4}\'');
+            if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == "ipv4") {
+                $dhcp = "dhcp";
+            }
+        }
         $ip   = exec("ifconfig | grep inet | sed -n '1p' | awk '{print $2}' | awk -F ':' '{print $2}'");
         $netmask= exec("ifconfig |grep inet| sed -n '1p'|awk '{print $4}'|awk -F ':' '{print $2}'");
         $gw = exec("route -n | grep eth0 | grep UG | awk '{print $2}'");
@@ -24,6 +30,8 @@ class NetworkController {
             }
         }
         echo json_encode(array("success"=>true,"dhcp"=>$dhcp,"ipaddress"=>$ip,"netmask"=>$netmask,"gateway"=>$gw,"dns"=>$dns));
+
+
     }
 
     public function updateNetworkAction() {
@@ -66,7 +74,7 @@ class NetworkController {
             $fileContent="[Match]\n";
             $fileContent.="Name=eth0\n";
             $fileContent.="[Network]\n";
-            $fileContent.="Address=".$_POST["ipaddress"]."\/".mask2cidr($_POST["netmask"])."\n";
+            $fileContent.="Address=".$_POST["ipaddress"]."/".mask2cidr($_POST["netmask"])."\n";
             $fileContent.="Gateway=".$_POST["gateway"]."\n";
 
             file_put_contents($config["interfacesFile"],$fileContent);

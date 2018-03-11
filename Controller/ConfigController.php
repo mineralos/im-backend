@@ -19,7 +19,7 @@ class ConfigController {
         if (isset($this->config)&&isset($this->config["pools"])) {
             echo json_encode(array("success" => true, "pools" => $this->config["pools"]), JSON_UNESCAPED_SLASHES);
         } else {
-            echo json_encode(array("success" => true, "message" => "missing configuration"));
+            echo json_encode(array("success" => false, "message" => "missing configuration"));
         }
     }
 
