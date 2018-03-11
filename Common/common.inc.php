@@ -7,7 +7,7 @@ function get_jwt_key() {
     global $config;
     $content=null;
     if (file_exists($config["jwtKeyFile"]))
-        $content=file_get_contents($config["jwtKeyFile"]);
+        $content=@file_get_contents($config["jwtKeyFile"]);
 
     if ($content==null||$content=="") {
         $key=rand_string(20);
@@ -37,7 +37,7 @@ function getLoggedUser() {
                 $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
                 $users=array();
                 if (file_exists($config["usersFile"]))
-                    $configContent=file_get_contents($config["usersFile"]);
+                    $configContent=@file_get_contents($config["usersFile"]);
                 if (isset($configContent)&&$configContent!=null&&$configContent!="") {
                     $users = json_decode($configContent, true);
                 }

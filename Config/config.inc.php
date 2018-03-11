@@ -1,7 +1,7 @@
 <?php
 
 $config["cgminerPort"]=4028;
-$config["configFile"]="/config/miner.conf";
+$config["configFile"]="/config/cgminer.conf";
 $config["usersFile"]="/config/web-users.json";
 $config["buildFile"]="/etc/os-release";
 $config["jwtKeyFile"]="/tmp/jwtK";
@@ -10,7 +10,7 @@ $config["serverName"]="DragonMint";
 $config["salt"]="8985dee0f2bc1b7a895d58bc4811e373";
 
 
-$config["interfacesFile"]="/etc/systemd/network/wired.network";
+$config["interfacesFile"]="/config/network/25-wired.network";
 $config["resolvFile"]="/etc/resolv.conf";
 #$config["dhcpPidFile"]="/var/run/udhcpc.eth0.pid";
 

@@ -7,7 +7,7 @@ class ConfigController {
     private $config;
     public function __construct(){
         global $config;
-        $configContent=file_get_contents($config["configFile"]);
+        $configContent=@file_get_contents($config["configFile"]);
         if ($configContent!=null&&$configContent!="") {
             $this->config = json_decode($configContent, true);
         }
@@ -16,27 +16,18 @@ class ConfigController {
 
     public function getPoolsAction() {
         header('Content-Type: application/json');
-        /*
-        $keysNeeded=array("Pool","UserName","Password");
-        $pools=array();
-        for ($i=1;$i<=3;$i++) {
-            foreach ($keysNeeded as $key) {
-                $val="";
-                if (array_key_exists($key . $i, $this->config)&&!is_null($this->config[$key . $i])&&$this->config[$key . $i]!="") {
-                    $val=($key=="Pool"?stripcslashes($this->config[$key . $i]):$this->config[$key . $i]);
-                }
-
-            }
+        if (isset($this->config)&&isset($this->config["pools"])) {
+            echo json_encode(array("success" => true, "pools" => $this->config["pools"]), JSON_UNESCAPED_SLASHES);
+        } else {
+            echo json_encode(array("success" => true, "message" => "missing configuration"));
         }
-        */
-        echo json_encode(array("success"=>true,"pools"=>$this->config["pools"]),JSON_UNESCAPED_SLASHES);
     }
 
     public function updatePoolsAction() {
         header('Content-Type: application/json');
 
         $keysNeeded=array("Pool","UserName","Password");
-        $newKeys=array("Pool","UserName","Password");
+        $newKeys=array("url","user","pass");
         $numPools=0;
         $pools=array();
         for ($i=1;$i<=3;$i++) {
@@ -46,8 +37,10 @@ class ConfigController {
                 if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="") {
                     $val=$_POST[$key . $i];
                 }
+                if (is_null($val)) {
+                    $val="";
+                }
                 $pool[$newKeys[$j]]=$val;
-                $this->config[$key . $i] = $val;
             }
             $pools[]=$pool;
         }

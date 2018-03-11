@@ -17,7 +17,10 @@ class NetworkController {
         if (file_exists($config["resolvFile"])) {
             $dnsContent = file($config["resolvFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($dnsContent as $item) {
-                $dns[]=trim(explode("nameserver ",$item)[1]);
+                $dnsParts=explode("nameserver ",$item);
+                if(isset($dnsParts[1])) {
+                    $dns[]=trim($dnsParts[1]);
+                }
             }
         }
         echo json_encode(array("success"=>true,"dhcp"=>$dhcp,"ipaddress"=>$ip,"netmask"=>$netmask,"gateway"=>$gw,"dns"=>$dns));

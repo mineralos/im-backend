@@ -67,12 +67,27 @@ class MinerController {
         if (file_exists($config["resolvFile"])) {
             $dnsContent = file($config["resolvFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($dnsContent as $item) {
-                $dns[]=trim(explode("nameserver ",$item)[1]);
+                if ($item[0] === '#') continue;
+                $dnsParts=explode("nameserver ",$item);
+                if (count($dnsParts)>1) {
+                    $dns[]=trim($dnsParts[1]);
+                } else {
+                    $dns[]="";
+                }
+
             }
         }
 
         //Version
-        $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
+        $version="undefined";
+        $fileContent=@file_get_contents($config["hardwareVersionFile"]);
+        if ($fileContent!=null&&$fileContent!="") {
+            $versionParts=explode(" ",trim($fileContent));
+            if (count($versionParts)>0) {
+                $version=$versionParts[0];
+            }
+        }
+        $hardwareVersion=$version;
         $macAddress=exec('cat /sys/class/net/eth0/address');
         $buildContent=parse_ini_file($config["buildFile"]);
         $buildDate=$buildContent["VERSION_ID"];
