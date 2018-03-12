@@ -26,9 +26,10 @@ function rand_string( $length ) {
 function getNetwork() {
     global $config;
     $networkFileParsed=@parse_ini_file($config["interfacesDirectory"].$config["interfacesFile"]);
+
     $dhcp="dhcp";
     if ($networkFileParsed!=null) {
-        if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == "yes") {
+        if (array_key_exists("DHCP", $networkFileParsed) && $networkFileParsed["DHCP"] == 1) {
             $dhcp = "dhcp";
         } else {
             $dhcp = "static";

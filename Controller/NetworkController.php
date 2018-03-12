@@ -30,7 +30,7 @@ class NetworkController {
             $fileContent.="DHCP=yes\n";
             $fileContent.="[DHCP]\n";
             $fileContent.="ClientIdentifier=mac\n";
-            file_put_contents($config["interfacesFile"],$fileContent);
+            file_put_contents($config["interfacesDirectory"].$config["interfacesFile"],$fileContent);
             echo json_encode(array("success"=>true));
         } else if ($_POST["dhcp"]=="static"){
             if (!isset($_POST["ipaddress"])||$_POST["ipaddress"]==""||!isValidIp($_POST["ipaddress"])) {
@@ -58,15 +58,14 @@ class NetworkController {
             $fileContent.="[Network]\n";
             $fileContent.="Address=".$_POST["ipaddress"]."/".mask2cidr($_POST["netmask"])."\n";
             $fileContent.="Gateway=".$_POST["gateway"]."\n";
+            $fileContent.="DNS=".$_POST["dns"][0]."\n";
+            $fileContent.="DNS=".$_POST["dns"][1]."\n";
 
             if (!file_exists($config["interfacesDirectory"]))
                 mkdir($config["interfacesDirectory"]);
 
             file_put_contents($config["interfacesDirectory"].$config["interfacesFile"],$fileContent);
 
-            $fileContentDns="nameserver ".$_POST["dns"][0]."\n";
-            $fileContentDns.="nameserver ".$_POST["dns"][1]."\n";
-            file_put_contents($config["resolvFile"],$fileContentDns);
 
             echo json_encode(array("success"=>true));
 
