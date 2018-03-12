@@ -108,7 +108,7 @@ class MinerController {
             !isset($_FILES['upfile']['error']) ||
             is_array($_FILES['upfile']['error'])
         ) {
-            echo json_encode(array("result"=>false,"message"=>"No upgrade file"));
+            echo json_encode(array("result"=>false,"output"=>array("No upgrade file")));
             return;
         }
 
@@ -119,28 +119,30 @@ class MinerController {
                 break;
             case UPLOAD_ERR_NO_FILE:
                 $error="No file sent";
+                break;
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
                 $error="Exceeded filesize limit.";
+                break;
             default:
                 $error="'Unknown errors";
         }
 
         if ($error!="") {
-            echo json_encode(array("result"=>false,"message"=>$error));
+            echo json_encode(array("result"=>false,"output"=>array($error)));
             return;
         }
 
         // You should also check filesize here.
         if ($_FILES['upfile']['size'] > $config["swUpdateMaxFileSize"]) {
             $error="Exceeded filesize limit.";
-            echo json_encode(array("result"=>false,"message"=>$error));
+            echo json_encode(array("result"=>false,"output"=>array($error)));
             return;
         }
 
         $ext=pathinfo( $_FILES['upfile']['name'], PATHINFO_EXTENSION);
         if (strtolower($ext)!="swu") {
-            echo json_encode(array("result"=>false,"message"=>"Invalid file format"));
+            echo json_encode(array("result"=>false,"output"=>array("Invalid file format")));
             return;
         }
 
@@ -149,10 +151,56 @@ class MinerController {
             $_FILES['upfile']['tmp_name'],
             $config["swUpdateImagePath"]
         )) {
-            echo json_encode(array("result"=>false,"message"=>"Failed to move uploaded file."));
+            echo json_encode(array("result"=>false,"output"=>array("Failed to move uploaded file.")));
             return;
         }
-        echo json_encode(array("success"=>true));
+        $notifyOutput=array();
+        exec("sync");
+        $notifyOutput[]="MD5 File: ".md5_file($config["swUpdateImagePath"]);
+
+        //Shutdown the swupdate service
+        $notifyOutput[]="Shutting down swupdate service";
+        exec("systemctl stop swupdate");
+
+        //Run Upgrade
+        $swUpdateService=new SWUpdateService();
+        $response=$swUpdateService->runUpgrade();
+
+        $success=($response["returnVar"]==0);
+
+        foreach($response["output"] as $lineOutput) {
+            if (strpos($lineOutput,"[NOTIFY]")>-1) {
+                $parts=explode(":",$lineOutput);
+                if ($parts[count($parts)-1]!=""&&strlen($parts[count($parts)-1])>1)
+                    $notifyOutput[]=$parts[count($parts)-1];
+            }
+        }
+
+        if ($success) {
+            //Delete User Settings
+            if (isset($_POST["keepsettings"])&&$_POST["keepsettings"]=="0") {
+                $notifyOutput[]="Removing cg Config File";
+                unlink($config["configFile"]);
+                $notifyOutput[]="Removing Users Config File";
+                unlink($config["usersFile"]);
+                $notifyOutput[]="Removing Network Config File";
+                unlink($config["interfacesDirectory"].$config["interfacesFile"]="25-wired.network");
+                exec("sync");
+                /*
+                $notifyOutput[]="Unmounting /config ";
+                exec("umount /config");
+                $notifyOutput[]="Formating /config";
+                exec("ubimkvol /dev/ubi1 -N config -m");
+                */
+
+            }
+
+            shell_exec('sleep 5; reboot >/dev/null 2>/dev/null &');
+            $notifyOutput[]="Rebooting miner";
+            echo json_encode(array("success"=>true,"output"=>$notifyOutput));
+        } else {
+            echo json_encode(array("success"=>false,"output"=>$notifyOutput));
+        }
 
 
 
