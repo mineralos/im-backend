@@ -27,7 +27,9 @@ class NetworkController {
             $fileContent="[Match]\n";
             $fileContent.="Name=eth0\n";
             $fileContent.="[Network]\n";
-            $fileContent.="DHCP=ipv4\n";
+            $fileContent.="DHCP=yes\n";
+            $fileContent.="[DHCP]\n";
+            $fileContent.="ClientIdentifier=mac\n";
             file_put_contents($config["interfacesFile"],$fileContent);
             echo json_encode(array("success"=>true));
         } else if ($_POST["dhcp"]=="static"){

@@ -49,6 +49,7 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
 //Admin
 if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
+
     //Update Pools to Config
     if (!$found)
         $found=$router->get('/api/updatePools', 'Config',"updatePools");

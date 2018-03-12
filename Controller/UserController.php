@@ -22,7 +22,6 @@ class UserController {
 
     }
 
-
     public function authAction() {
         global $config;
         if (isset($_POST["username"])&&$_POST["username"]!=""&&isset($_POST["password"])&&$_POST["password"]!="") {

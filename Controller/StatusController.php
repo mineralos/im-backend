@@ -14,7 +14,7 @@ class StatusController {
         $fansSpeed=0;
 
         for ($i=0;$i<3;$i++) {
-            if (array_key_exists($i,$response["stats"][0]["STATS"])) {
+            if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"])) {
                 $stats = $response["stats"][0]["STATS"][$i];
                 if (intval($stats["Fan duty"]) > 0) {
                     $fansSpeed = intval($stats["Fan duty"]);
