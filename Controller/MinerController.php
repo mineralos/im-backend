@@ -10,6 +10,10 @@ class MinerController {
 
     }
 
+    /*
+     * Obtain the hardware version from a predefined file
+     * and return a int generated from the second character
+     */
     private  function getType() {
         global $config;
         $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
@@ -17,10 +21,16 @@ class MinerController {
         return $typeNum;
     }
 
+    /*
+     * Return the result of getType() function in JSON format
+     */
     public function getTypeAction() {
         echo json_encode(array("success"=>true,"type"=>$this->getType()));
     }
 
+    /*
+     * Sends reboot system call to the miner
+     */
     public function rebootAction() {
         header('Content-Type: application/json');
         echo json_encode(array("success"=>true));
@@ -31,7 +41,10 @@ class MinerController {
 
     }
 
-
+    /*
+     * Obtains info from the network, cgminer and system and generate
+     * a JSON output with all information obtained
+     */
     public function getOverviewAction() {
         global $config;
         //Memory and Uptime
@@ -101,6 +114,11 @@ class MinerController {
 
     }
 
+    /*
+     * Validate the file sent by the customer and proceed to
+     * write the file into /tmp directory, thena swupdate system call
+     * is executed with the file uploaded
+     */
     public function upgradeAction() {
         global $config;
 

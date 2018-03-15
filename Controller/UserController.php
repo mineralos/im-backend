@@ -6,6 +6,12 @@ use Firebase\JWT\JWT;
 class UserController {
 
     private $users=null;
+
+    /*
+     * Parse the users configuration file into the property users,
+     * if the file doesn't exists the file is created with the predefined
+     * username and password
+     */
     public function __construct(){
         global $config;
         $configContent=null;
@@ -22,6 +28,9 @@ class UserController {
 
     }
 
+    /*
+     * Action that receive a username and password from POST and return a JWT
+     */
     public function authAction() {
         global $config;
         if (isset($_POST["username"])&&$_POST["username"]!=""&&isset($_POST["password"])&&$_POST["password"]!="") {
@@ -55,6 +64,9 @@ class UserController {
         }
     }
 
+    /*
+     * Change the password of a user and update the config gile
+     */
     public function updatePasswordAction() {
         global $config;
         header('Content-Type: application/json');
@@ -105,6 +117,9 @@ class UserController {
 
     }
 
+    /*
+     * Dump the $users property into the users configuration file
+     */
     private function save() {
         global $config;
 

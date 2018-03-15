@@ -5,6 +5,10 @@ use DragonMint\Service\CgminerService;
 class ConfigController {
 
     private $config;
+
+    /*
+     * Load the json configuration file into the $config property of the class
+     */
     public function __construct(){
         global $config;
         $configContent=@file_get_contents($config["configFile"]);
@@ -14,6 +18,9 @@ class ConfigController {
 
     }
 
+    /*
+     * Return the pools from the cgminer config file in JSON format
+     */
     public function getPoolsAction() {
         header('Content-Type: application/json');
         if (isset($this->config)&&isset($this->config["pools"])) {
@@ -23,6 +30,10 @@ class ConfigController {
         }
     }
 
+    /*
+     * Update the pools received ina POST request and
+     * update the config file, then restarts cgminer
+     */
     public function updatePoolsAction() {
         header('Content-Type: application/json');
 
@@ -51,11 +62,12 @@ class ConfigController {
         } else {
             echo json_encode(array("success"=>true));
         }
-
-
-
     }
 
+    /*
+     * Write the actual $config property into the configuration file
+     * and restart the cgminer service
+     */
     private function save() {
         global $config;
 

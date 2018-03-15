@@ -2,7 +2,12 @@
 
 use Firebase\JWT\JWT;
 
-
+/*
+ * Obtains the JWT from a predefined file
+ * if the file doesn't exists, generate random
+ * key and write that key to a file.
+ * This file is being generated on every reboot.
+ */
 function get_jwt_key() {
     global $config;
     $content=null;
@@ -18,11 +23,17 @@ function get_jwt_key() {
     return $content;
 }
 
+/*
+ * Generate random string with a desired length
+ */
 function rand_string( $length ) {
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     return substr(str_shuffle($chars),0,$length);
 }
 
+/*
+ * Common function to obtain current network setting
+ */
 function getNetwork() {
     global $config;
     $networkFileParsed=@parse_ini_file($config["interfacesDirectory"].$config["interfacesFile"]);
@@ -60,6 +71,11 @@ function getNetwork() {
         "dns2"=>$dns[1]);
 }
 
+/*
+ * It returns the name of the user (admin/guest) if valid credentials are provided
+ * through JWT or Basic Auth. returns null if the authentication fail or "expired" if the
+ * JWT is expired
+ */
 function getLoggedUser() {
     global $config;
     $token=getBearerToken();
@@ -97,6 +113,9 @@ function getLoggedUser() {
     return null;
 }
 
+/*
+ * Validate an IP address
+ */
 function isValidIp($ip) {
     if (long2ip(ip2long($ip)) == $ip) {
         return true;
@@ -104,21 +123,35 @@ function isValidIp($ip) {
     return false;
 }
 
-
+/*
+ * Convert IP Mask Address format to Cidr, needed for systemd network
+ * configuration file
+ */
 function mask2cidr($mask){
     $long = ip2long($mask);
     $base = ip2long('255.255.255.255');
     return 32-log(($long ^ $base)+1,2);
 }
 
+/*
+ * Generate a hash using a predefined salt
+ */
 function generatePasswordHash($password) {
     global $config;
     return hash('sha256', $config["salt"].$password);
 }
+
+/*
+ * Remove special characters from the worker, not implemented yet
+ */
 function cleanWorker($string) {
     $string = str_replace(' ', '-', $string);
     return preg_replace('/[^A-Za-z0-9\-\.\_]/', '', $string);
 }
+
+/*
+ * Multi server function to obtain the Headers Autorization
+ */
 function getAuthorizationHeader(){
     $headers = null;
     if (isset($_SERVER['Authorization'])) {
@@ -138,6 +171,9 @@ function getAuthorizationHeader(){
     return $headers;
 }
 
+/*
+ * Parses the authorization header of a request and obtain the Baerer Token
+ */
 function getBearerToken() {
     $headers = getAuthorizationHeader();
     if (!empty($headers)) {

@@ -12,7 +12,6 @@ $config["salt"]="8985dee0f2bc1b7a895d58bc4811e373";
 $config["interfacesDirectory"]="/config/network/";
 $config["interfacesFile"]="25-wired.network";
 $config["resolvFile"]="/etc/resolv.conf";
-#$config["dhcpPidFile"]="/var/run/udhcpc.eth0.pid";
 
 //Default Passwords in Case Missing or Corrupted Users File
 $config["userAdmin"]="admin";

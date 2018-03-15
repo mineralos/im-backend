@@ -3,6 +3,9 @@
 
 class NetworkController {
 
+    /*
+     * Returns JSON with the current network settings of the miner
+     */
     public function getNetworkAction() {
         global $config;
         header('Content-Type: application/json');
@@ -14,6 +17,9 @@ class NetworkController {
 
     }
 
+    /*
+     * Update networks settings and restart the network
+     */
     public function updateNetworkAction() {
         global $config;
         header('Content-Type: application/json');
@@ -74,11 +80,19 @@ class NetworkController {
 
     }
 
+    /*
+     * Private function to restart the network
+     */
     private function restartNetwork() {
         exec('systemctl restart systemd-networkd');
     }
 
 
+    /*
+     * Response success true when this action is executed,
+     * used to the network GUI to know when the miner is back online
+     * after a network settings update
+     */
     public function pingAction() {
         header('Content-Type: application/json');
         echo json_encode(array("success"=>true));

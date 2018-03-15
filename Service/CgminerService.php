@@ -6,6 +6,10 @@ namespace DragonMint\Service;
 class CgminerService {
 
 
+    /*
+     * Open a socket connection to localhost and a predefined port and return the response
+     * the cgminer API
+     */
     public function call($cmd,$parameter=null) {
         global $config;
         $sock=$this->getSock("127.0.0.1",$config["cgminerPort"]);
@@ -16,6 +20,9 @@ class CgminerService {
         return $response;
     }
 
+    /*
+     * Create a sock from especified address and port
+     */
     public function getSock($addr, $port)
     {
         try {
@@ -39,6 +46,9 @@ class CgminerService {
         }
     }
 
+    /*
+     * Read one line from the received buffer of the cgminer API call
+     */
     public function readSockLine($socket)
     {
         $line = '';
@@ -54,6 +64,9 @@ class CgminerService {
         return $line;
     }
 
+    /*
+     * Send the command(s) to the socket and reply a JSON response from the data obtained
+     */
     public function request($socket,$cmd,$parameter=null)
     {
         try {
@@ -84,6 +97,9 @@ class CgminerService {
         return null;
     }
 
+    /*
+     * Original API function from cgminer sourte, should be deleted
+     */
     public function requestOld($socket,$cmd)
     {
         try {

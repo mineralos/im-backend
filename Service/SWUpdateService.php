@@ -4,6 +4,7 @@ namespace DragonMint\Service;
 
 class SWUpdateService {
 
+    /* Not being used, created to consume a Unix Socket to get the obtained*/
     public function getProgress() {
         global $config;
         $sock = stream_socket_client($config["swUpdateProgressSocket"], $errno, $errstr);
@@ -17,6 +18,10 @@ class SWUpdateService {
         return null;
     }
 
+    /*
+     * Determine the command line to execute to start the upgrade of the firmware
+     * and returns the response of the swupdate system call
+     */
     public function runUpgrade() {
         global $config;
         $returnVar=-1;

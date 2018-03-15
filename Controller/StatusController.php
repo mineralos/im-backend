@@ -5,6 +5,12 @@ use DragonMint\Service\CgminerService;
 class StatusController {
 
 
+    /*
+     * Consumes pools, devs, stats from cgminer API
+     * and create a JSON response with all the information
+     * obtained. A new hardware option was created to include
+     * the fans speed
+     */
     public function getSummaryAction() {
         $service = new CgminerService();
         header('Content-Type: application/json');

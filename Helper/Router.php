@@ -8,6 +8,11 @@ class Router {
     public function __construct($request){
         $this->request = $request;
     }
+
+    /*
+     * Receive the URI, the controller on charge to handle that URI and an Action (function name).
+     * If the URI matches with the get variable "action" the route is activated
+     */
     public function get($route, $controller, $action){
 
         $routeParts=explode("/",$route);
