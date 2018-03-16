@@ -100,10 +100,3 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
  * If the request hit this place is because it didn't find a Route
  */
 echo json_encode(array("success"=>false,"message"=>"invalid request"));
-
-
-
-
-
-
-?>

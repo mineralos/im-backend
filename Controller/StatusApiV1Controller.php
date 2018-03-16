@@ -39,5 +39,3 @@ class StatusApiV1Controller extends StatusController {
     }
 
 }
-
-?>

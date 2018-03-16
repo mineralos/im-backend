@@ -22,5 +22,3 @@ class NetworkApiV1Controller extends NetworkController {
 
 
 }
-
-?>
