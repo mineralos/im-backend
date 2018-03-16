@@ -26,7 +26,7 @@ class Router {
                 if (method_exists($controller,$action."Action")) {
                     $method=$action."Action";
                     $controller->$method();
-                    return true;
+                    exit(0); //Application is done, dirty exit but fast for the miner
                 } else {
                     return false;
                 }

@@ -14,7 +14,7 @@ class MinerController {
      * Obtain the hardware version from a predefined file
      * and return a int generated from the second character
      */
-    private  function getType() {
+    public  function getType() {
         global $config;
         $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
         $typeNum=15+intval($hardwareVersion[1]);
@@ -25,8 +25,12 @@ class MinerController {
      * Return the result of getType() function in JSON format
      */
     public function getTypeAction() {
+        header('Content-Type: application/json');
         echo json_encode(array("success"=>true,"type"=>$this->getType()));
     }
+
+
+
 
     /*
      * Sends reboot system call to the miner
@@ -37,18 +41,10 @@ class MinerController {
         exec("reboot");
     }
 
-    private function getLock() {
-
-    }
-
     /*
-     * Obtains info from the network, cgminer and system and generate
-     * a JSON output with all information obtained
+     * Get Memory Values
      */
-    public function getOverviewAction() {
-        global $config;
-        //Memory and Uptime
-        $uptime=exec("uptime");
+    public function getMemory() {
         $memTotal=0;
         $memFree=0;
         $memCached=0;
@@ -68,12 +64,14 @@ class MinerController {
                     break;
                 case "MemAvailable:":
                     $memCachedFree=intval($parts[1]);
-                break;
+                    break;
             }
         }
+        return array("memTotal"=>$memTotal,"memFree"=>$memFree,"memCached"=>$memCached,"memCachedFree"=>$memCachedFree);
+    }
 
-
-
+    public function getVersions() {
+        global $config;
         //Version
         $version="undefined";
         $fileContent=@file_get_contents($config["hardwareVersionFile"]);
@@ -89,6 +87,25 @@ class MinerController {
         $buildDate=$buildContent["VERSION_ID"];
         $plarformVersion=$buildContent["VERSION"];
 
+        return array("hwver"=>$hardwareVersion,
+            "ethaddr"=>$macAddress,
+            "build_date"=>$buildDate,
+            "platform_v"=>$plarformVersion);
+    }
+
+    /*
+     * Obtains info from the network, cgminer and system and generate
+     * a JSON output with all information obtained
+     */
+    public function getOverviewAction() {
+        global $config;
+        header('Content-Type: application/json');
+        $uptime=trim(exec("uptime"));
+
+        $memory=$this->getMemory();
+
+        $versions=$this->getVersions();
+
         //Network
         $network=getNetwork();
 
@@ -97,19 +114,14 @@ class MinerController {
             "type"=>$this->getType(),
             "hardware"=>array(
                 "status"=>$uptime,
-                "memUsed"=>$memTotal-$memFree,
-                "memFree"=>$memFree,
-                "memTotal"=>$memTotal,
-                "cacheUsed"=>$memCached,
-                "cacheFree"=>$memCachedFree,
-                "cacheTotal"=>$memCachedFree+$memCached),
+                "memUsed"=>$memory["memTotal"]-$memory["memFree"],
+                "memFree"=>$memory["memFree"],
+                "memTotal"=>$memory["memTotal"],
+                "cacheUsed"=>$memory["memCached"],
+                "cacheFree"=>$memory["memCachedFree"],
+                "cacheTotal"=>$memory["memCachedFree"]+$memory["memCached"]),
             "network"=>$network,
-            "version"=>array(
-                "hwver"=>$hardwareVersion,
-                "ethaddr"=>$macAddress,
-                "build_date"=>$buildDate,
-                "platform_v"=>$plarformVersion
-            )
+            "version"=>$versions
         ));
 
     }
