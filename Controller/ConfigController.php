@@ -75,9 +75,11 @@ class ConfigController {
         file_put_contents($config["configFile"],json_encode($this->config,JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
 
         //Shutdown CgMiner
-        $service = new CgminerService();
-        $response=$service->call("systemctl restart cgminer.service",3);
-        return ($response==null);
+        $returnVar=-1;
+        $output=array();
+        exec("systemctl restart cgminer.service",$output,$returnVar);
+
+        return ($returnVar==0);
     }
 
 }
