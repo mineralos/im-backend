@@ -1,6 +1,7 @@
 <?php
 
 $config["cgminerPort"]=4028;
+$config["configDirectory"]="/config/";
 $config["configFile"]="/config/cgminer.conf";
 $config["usersFile"]="/config/web-users.json";
 $config["buildFile"]="/etc/os-release";
@@ -12,6 +13,7 @@ $config["salt"]="8985dee0f2bc1b7a895d58bc4811e373";
 $config["interfacesDirectory"]="/config/network/";
 $config["interfacesFile"]="25-wired.network";
 $config["resolvFile"]="/etc/resolv.conf";
+$config["logsDumpedFile"]="/tmp/miner.log";
 
 //Default Passwords in Case Missing or Corrupted Users File
 $config["userAdmin"]="admin";

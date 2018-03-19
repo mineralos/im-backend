@@ -49,6 +49,9 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
     //Get Miner Type
     $router->get('/api/overview', 'Miner',"getOverview");
+
+    //Ping
+    $router->get('/api/ping', 'Network',"ping");
 }
 
 /*
@@ -65,14 +68,14 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Update Network
     $router->get('/api/updateNetwork', 'Network',"updateNetwork");
 
-    //Ping
-    $router->get('/api/ping', 'Network',"ping");
-
     //Reboot
     $router->get('/api/reboot', 'Miner',"reboot");
 
-    //SWUpdate progress
-    $router->get('/api/upgrade', 'Miner',"upgrade");
+    //Dump Logs
+    $router->get('/api/getLogs', 'Miner','getLogs');
+
+    //Factory Reset
+    $router->get('/api/factoryReset', 'Miner','factoryReset');
 
     /*
      * Interface with the old API

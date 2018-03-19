@@ -11,6 +11,25 @@ class MinerController {
     }
 
     /*
+     * Dump logs to a file and send it
+     */
+    public function getLogsAction() {
+        global $config;
+        exec("journalctl > ".$config["logsDumpedFile"]);
+        if (file_exists($config["logsDumpedFile"])) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Disposition: attachment; filename="'.basename($config["logsDumpedFile"]).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($config["logsDumpedFile"]));
+            readfile($config["logsDumpedFile"]);
+        }
+    }
+
+
+    /*
      * Obtain the hardware version from a predefined file
      * and return a int generated from the second character
      */
@@ -30,15 +49,23 @@ class MinerController {
     }
 
 
-
-
     /*
      * Sends reboot system call to the miner
      */
     public function rebootAction() {
         header('Content-Type: application/json');
+        shell_exec('sleep 4;/bin/systemctl reboot >/dev/null 2>/dev/null &');
         echo json_encode(array("success"=>true));
-        exec("reboot");
+    }
+
+    /*
+     * Reset to factory reset deleting all the content of /config and then reboot the miner
+     */
+    public function factoryResetAction() {
+        global $config;
+        header('Content-Type: application/json');
+        shell_exec('sleep 4; rm -rf '.$config["configDirectory"].'/*;/bin/systemctl reboot >/dev/null 2>/dev/null &');
+        echo json_encode(array("success"=>true));
     }
 
     /*
@@ -131,6 +158,7 @@ class MinerController {
      * write the file into /tmp directory, thena swupdate system call
      * is executed with the file uploaded
      */
+    /*
     public function upgradeAction() {
         global $config;
 
@@ -216,12 +244,6 @@ class MinerController {
                 $notifyOutput[]="Removing Network Config File";
                 unlink($config["interfacesDirectory"].$config["interfacesFile"]="25-wired.network");
                 exec("sync");
-                /*
-                $notifyOutput[]="Unmounting /config ";
-                exec("umount /config");
-                $notifyOutput[]="Formating /config";
-                exec("ubimkvol /dev/ubi1 -N config -m");
-                */
 
             }
 
@@ -235,7 +257,7 @@ class MinerController {
 
 
     }
-
+    */
 
 
 }
