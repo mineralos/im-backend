@@ -1,3 +1,5 @@
-.idea
-.composer
-.composer.lock
+vendor
+phpunit.phar
+phpunit.phar.asc
+composer.phar
+composer.lock

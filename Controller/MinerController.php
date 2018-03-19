@@ -1,6 +1,5 @@
 <?php
 
-use DragonMint\Service\SWUpdateService;
 
 class MinerController {
 
