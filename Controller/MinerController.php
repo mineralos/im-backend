@@ -99,24 +99,42 @@ class MinerController {
     public function getVersions() {
         global $config;
         //Version
-        $version="undefined";
+        $version="";
+        $buildDate="";
+        $hardwareVersion="";
+
         $fileContent=@file_get_contents($config["hardwareVersionFile"]);
         if ($fileContent!=null&&$fileContent!="") {
-            $versionParts=explode(" ",trim($fileContent));
-            if (count($versionParts)>0) {
-                $version=$versionParts[0];
+            $hwVersionParts=explode(" ",trim($fileContent));
+            if (count($hwVersionParts)>0) {
+                $hardwareVersion=$hwVersionParts[0];
             }
         }
-        $hardwareVersion=$version;
+
+
+        $flag=trim(exec('/usr/sbin/fw_printenv -n image_flag'));
+        if ($flag!="") {
+            if ($flag=="0") {
+                $version=trim(exec('/usr/sbin/fw_printenv -n version_0'));
+            } else if ($flag=="1") {
+                $version=trim(exec('/usr/sbin/fw_printenv -n version_1'));
+            }
+        }
+        if ($version!=""){
+            $versionParts=explode("_",$version);
+            if (count($versionParts)>=3) { //Well formatted
+                $date=date_create_from_format('Ymd His', $versionParts[1]." ".$versionParts[2]);
+                $buildDate=date_format($date,'jS \of F Y h:i A');
+            }
+        }
+
         $macAddress=exec('cat /sys/class/net/eth0/address');
-        $buildContent=parse_ini_file($config["buildFile"]);
-        $buildDate=$buildContent["VERSION_ID"];
-        $plarformVersion=$buildContent["VERSION"];
+
 
         return array("hwver"=>$hardwareVersion,
             "ethaddr"=>$macAddress,
             "build_date"=>$buildDate,
-            "platform_v"=>$plarformVersion);
+            "platform_v"=>$version);
     }
 
     /*
