@@ -3,6 +3,7 @@
 $config["cgminerPort"]=4028;
 $config["configDirectory"]="/config/";
 $config["configFile"]="/config/cgminer.conf";
+$config["backupConfigFile"]="/config/.cgminer.conf";
 $config["usersFile"]="/config/web-users.json";
 $config["buildFile"]="/etc/os-release";
 $config["jwtKeyFile"]="/tmp/jwtK";
@@ -24,7 +25,7 @@ $config["passwordGuest"]="dragonguest";
 //Versions
 $config["hardwareVersionFile"]="/etc/hwrevision";
 
-//Update
-$config["swUpdateProgressSocket"]="unix:///tmp/swupdateprog";
-$config["swUpdateMaxFileSize"]=100*1024*1024;//100Mb
-$config["swUpdateImagePath"]="/tmp/update.swu";
+//Self Test
+$config["selfTestCmd"]="/bin/dm-selftest --production";
+$config["selfTestLockFile"]="/tmp/ageing_lock";
+$config["selfTestLogFile"]="/tmp/ageing.log";

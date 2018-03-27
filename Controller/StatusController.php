@@ -37,4 +37,22 @@ class StatusController {
         }
     }
 
+    /*
+     * Consumes stats from cgminer API and create a JSON response
+     * with all the information obtained
+     */
+    public function getStatsAction() {
+        $service = new CgminerService();
+        header('Content-Type: application/json');
+        $response=$service->call("stats");
+
+
+        if (is_array($response)&&isset($response)) {
+            $response["success"]=true;
+            echo json_encode($response);
+        } else {
+            echo json_encode(array("success" => false));
+        }
+    }
+
 }

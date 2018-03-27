@@ -4,7 +4,6 @@ include __DIR__.'/Common/common.inc.php';
 include __DIR__.'/Config/config.inc.php';
 include __DIR__.'/Helper/Router.php';
 include __DIR__.'/Service/CgminerService.php';
-include __DIR__.'/Service/SWUpdateService.php';
 require_once('vendor/autoload.php');
 
 
@@ -12,6 +11,7 @@ use DragonMint\Helper\Router;
 
 /*
  * Get the user logged, from JWT or Basic Auth
+ *
  */
 $loggedUser=getLoggedUser();
 if ($loggedUser=="expired") {
@@ -52,6 +52,9 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
     //Ping
     $router->get('/api/ping', 'Network',"ping");
+
+    //Factory Stats
+    $router->get('/api/stats', 'Status','getStats');
 }
 
 /*
@@ -76,6 +79,21 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //Factory Reset
     $router->get('/api/factoryReset', 'Miner','factoryReset');
+
+    //Miner Config has Ageing Parameters
+    $router->get('/api/hasAgeing', 'Config',"minerHasAgeingConfig");
+
+    //Returns true if self test is running or false if not
+    $router->get('/api/selfTestStatus', 'Miner',"getSelfTestStatus");
+
+    //Start Self Test
+    $router->get('/api/startSelfTest', 'Miner',"startSelfTest");
+
+    //Get Self Test Logs
+    $router->get('/api/getSelfTestLog', 'Miner',"getSelfTestLog");
+
+    //Set Auto Ageing Config
+    $router->get('/api/setAutoTune', 'Config',"setAutoTuneConfig");
 
     /*
      * Interface with the old API

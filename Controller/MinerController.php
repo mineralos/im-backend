@@ -96,6 +96,7 @@ class MinerController {
         return array("memTotal"=>$memTotal,"memFree"=>$memFree,"memCached"=>$memCached,"memCachedFree"=>$memCachedFree);
     }
 
+
     public function getVersions() {
         global $config;
         //Version
@@ -171,110 +172,64 @@ class MinerController {
     }
 
     /*
-     * Validate the file sent by the customer and proceed to
-     * write the file into /tmp directory, thena swupdate system call
-     * is executed with the file uploaded
+     * Run self-test if it's not running
      */
-    /*
-    public function upgradeAction() {
+    public function startSelfTestAction() {
         global $config;
-
-        if (
-            !isset($_FILES['upfile']['error']) ||
-            is_array($_FILES['upfile']['error'])
-        ) {
-            echo json_encode(array("result"=>false,"output"=>array("No upgrade file")));
-            return;
-        }
-
-        // Check $_FILES['upfile']['error'] value.
-        $error="";
-        switch ($_FILES['upfile']['error']) {
-            case UPLOAD_ERR_OK:
-                break;
-            case UPLOAD_ERR_NO_FILE:
-                $error="No file sent";
-                break;
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
-                $error="Exceeded filesize limit.";
-                break;
-            default:
-                $error="'Unknown errors";
-        }
-
-        if ($error!="") {
-            echo json_encode(array("result"=>false,"output"=>array($error)));
-            return;
-        }
-
-        // You should also check filesize here.
-        if ($_FILES['upfile']['size'] > $config["swUpdateMaxFileSize"]) {
-            $error="Exceeded filesize limit.";
-            echo json_encode(array("result"=>false,"output"=>array($error)));
-            return;
-        }
-
-        $ext=pathinfo( $_FILES['upfile']['name'], PATHINFO_EXTENSION);
-        if (strtolower($ext)!="swu") {
-            echo json_encode(array("result"=>false,"output"=>array("Invalid file format")));
-            return;
-        }
-
-
-        if (!move_uploaded_file(
-            $_FILES['upfile']['tmp_name'],
-            $config["swUpdateImagePath"]
-        )) {
-            echo json_encode(array("result"=>false,"output"=>array("Failed to move uploaded file.")));
-            return;
-        }
-        $notifyOutput=array();
-        exec("sync");
-        $notifyOutput[]="MD5 File: ".md5_file($config["swUpdateImagePath"]);
-
-        //Shutdown the swupdate service
-        $notifyOutput[]="Shutting down swupdate service";
-        exec("systemctl stop swupdate");
-
-        //Run Upgrade
-        $swUpdateService=new SWUpdateService();
-        $response=$swUpdateService->runUpgrade();
-
-        $success=($response["returnVar"]==0);
-
-        foreach($response["output"] as $lineOutput) {
-            if (strpos($lineOutput,"[NOTIFY]")>-1) {
-                $parts=explode(":",$lineOutput);
-                if ($parts[count($parts)-1]!=""&&strlen($parts[count($parts)-1])>1)
-                    $notifyOutput[]=$parts[count($parts)-1];
+        header('Content-Type: application/json');
+        if (!file_exists($config["selfTestLockFile"])) {
+            //Run self test
+            //Delete Previous Log
+            if (file_exists($config["selfTestLogFile"])) {
+                unlink($config["selfTestLogFile"]);
             }
-        }
-
-        if ($success) {
-            //Delete User Settings
-            if (isset($_POST["keepsettings"])&&$_POST["keepsettings"]=="0") {
-                $notifyOutput[]="Removing cg Config File";
-                unlink($config["configFile"]);
-                $notifyOutput[]="Removing Users Config File";
-                unlink($config["usersFile"]);
-                $notifyOutput[]="Removing Network Config File";
-                unlink($config["interfacesDirectory"].$config["interfacesFile"]="25-wired.network");
-                exec("sync");
-
-            }
-
-            shell_exec('sleep 5; reboot >/dev/null 2>/dev/null &');
-            $notifyOutput[]="Rebooting miner";
-            echo json_encode(array("success"=>true,"output"=>$notifyOutput));
+            shell_exec($config["selfTestCmd"].' >/dev/null 2>/dev/null &');
+            echo json_encode(array("success"=>true));
         } else {
-            echo json_encode(array("success"=>false,"output"=>$notifyOutput));
+            //Already running
+            echo json_encode(array("success"=>false,"message"=>"Self Test is already running"));
+        }
+    }
+
+    /*
+     * Returns true of false depending if the selftest is running
+     */
+    public function getSelfTestStatusAction() {
+        global $config;
+        header('Content-Type: application/json');
+        $isRunning=file_exists($config["selfTestLockFile"]);
+        echo json_encode(array("success"=>true,"running"=>$isRunning));
+    }
+
+    /*
+     * Get the log file of SelfTest
+     */
+    public function getSelfTestLogAction() {
+        global $config;
+        header('Content-Type: application/json');
+        $isRunning=file_exists($config["selfTestLockFile"]);
+        $fromLine=0;
+        if (isset($_POST["line"])) {
+            $fromLine=$_POST["line"];
         }
 
-
+        $lines=array();
+        $handle = fopen($config["selfTestLogFile"], "r");
+        if ($handle) {
+            $i=0;
+            while (($line = fgets($handle)) !== false) {
+                if ($i>=$fromLine) {
+                    $lines[]=$line;
+                }
+                $i++;
+            }
+            fclose($handle);
+            echo json_encode(array("success"=>true,"running"=>$isRunning,"lines"=>$lines,"lastLine"=>$fromLine));
+        } else {
+            echo json_encode(array("success"=>false,"running"=>$isRunning,"message"=>"Can't open log file"));
+        }
 
     }
-    */
 
 
 }
