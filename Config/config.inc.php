@@ -25,7 +25,7 @@ $config["passwordGuest"]="dragonguest";
 //Versions
 $config["hardwareVersionFile"]="/etc/hwrevision";
 $config["minerTypeFile"]="/tmp/type";
-$config["urlFirmwareVersions"]="https://download.halongmining.com/v1/versions.json";
+$config["urlFirmwareVersions"]="https://download.halongmining.com/v1/versions";
 
 //Self Test
 $config["selfTestCmd"]="/bin/dm-selftest --production";
