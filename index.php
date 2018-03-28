@@ -55,6 +55,8 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
     //Factory Stats
     $router->get('/api/stats', 'Status','getStats');
+
+
 }
 
 /*
@@ -94,6 +96,9 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //Set Auto Ageing Config
     $router->get('/api/setAutoTune', 'Config',"setAutoTuneConfig");
+
+    //Latest Firmware Version
+    $router->get('/api/getLatestFirmwareVersion', 'Update','getLatestFirmwareVersion');
 
     /*
      * Interface with the old API

@@ -29,22 +29,11 @@ class MinerController {
 
 
     /*
-     * Obtain the hardware version from a predefined file
-     * and return a int generated from the second character
-     */
-    public  function getType() {
-        global $config;
-        $hardwareVersion=explode(" ",trim(@file_get_contents($config["hardwareVersionFile"])))[0];
-        $typeNum=15+intval($hardwareVersion[1]);
-        return $typeNum;
-    }
-
-    /*
      * Return the result of getType() function in JSON format
      */
     public function getTypeAction() {
         header('Content-Type: application/json');
-        echo json_encode(array("success"=>true,"type"=>$this->getType()));
+        echo json_encode(array("success"=>true,"type"=>getMinerType()));
     }
 
 
@@ -97,46 +86,7 @@ class MinerController {
     }
 
 
-    public function getVersions() {
-        global $config;
-        //Version
-        $version="";
-        $buildDate="";
-        $hardwareVersion="";
 
-        $fileContent=@file_get_contents($config["hardwareVersionFile"]);
-        if ($fileContent!=null&&$fileContent!="") {
-            $hwVersionParts=explode(" ",trim($fileContent));
-            if (count($hwVersionParts)>0) {
-                $hardwareVersion=$hwVersionParts[0];
-            }
-        }
-
-
-        $flag=trim(exec('/usr/sbin/fw_printenv -n image_flag'));
-        if ($flag!="") {
-            if ($flag=="0") {
-                $version=trim(exec('/usr/sbin/fw_printenv -n version_0'));
-            } else if ($flag=="1") {
-                $version=trim(exec('/usr/sbin/fw_printenv -n version_1'));
-            }
-        }
-        if ($version!=""){
-            $versionParts=explode("_",$version);
-            if (count($versionParts)>=3) { //Well formatted
-                $date=date_create_from_format('Ymd His', $versionParts[1]." ".$versionParts[2]);
-                $buildDate=date_format($date,'jS \of F Y h:i A');
-            }
-        }
-
-        $macAddress=exec('cat /sys/class/net/eth0/address');
-
-
-        return array("hwver"=>$hardwareVersion,
-            "ethaddr"=>$macAddress,
-            "build_date"=>$buildDate,
-            "platform_v"=>$version);
-    }
 
     /*
      * Obtains info from the network, cgminer and system and generate
@@ -149,14 +99,14 @@ class MinerController {
 
         $memory=$this->getMemory();
 
-        $versions=$this->getVersions();
+        $versions=getVersions();
 
         //Network
         $network=getNetwork();
 
         echo json_encode(array(
             "success"=>true,
-            "type"=>$this->getType(),
+            "type"=>getMinerType(),
             "hardware"=>array(
                 "status"=>$uptime,
                 "memUsed"=>$memory["memTotal"]-$memory["memFree"],

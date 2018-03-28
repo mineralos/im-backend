@@ -12,6 +12,7 @@ class StatusController {
      * the fans speed
      */
     public function getSummaryAction() {
+
         $service = new CgminerService();
         header('Content-Type: application/json');
         $response=$service->call("pools+devs+stats");
@@ -35,6 +36,7 @@ class StatusController {
         } else {
             echo json_encode(array("success" => false));
         }
+
     }
 
     /*

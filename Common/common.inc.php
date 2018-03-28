@@ -172,6 +172,89 @@ function getAuthorizationHeader(){
 }
 
 /*
+ * Get HardWare version from
+ */
+function getHardwareVersion() {
+    global $config;
+    $fileContent=@file_get_contents($config["hardwareVersionFile"]);
+    $hwVersion="";
+    if ($fileContent!=null&&strlen($fileContent)>0) {
+        $hwVersionParts=explode(" ",trim($fileContent));
+        $hwVersion=$hwVersionParts[0];
+    }
+    return $hwVersion;
+}
+
+/*
+ * Get Hardware Type
+ */
+function getMinerType() {
+    global $config;
+    $fileContent=@file_get_contents($config["minerTypeFile"]);
+    $type="";
+    if ($fileContent!=null&&strlen($fileContent)>0) {
+        $type=trim($fileContent);
+    }
+    return $type;
+}
+
+
+/*
+ * Get Versions Array
+ */
+function getVersions() {
+    global $config;
+    //Version
+    $version="";
+    $buildDate="";
+    $hardwareVersion="";
+
+    $fileContent=@file_get_contents($config["hardwareVersionFile"]);
+    if ($fileContent!=null&&$fileContent!="") {
+        $hwVersionParts=explode(" ",trim($fileContent));
+        if (count($hwVersionParts)>0) {
+            $hardwareVersion=$hwVersionParts[0];
+        }
+    }
+
+
+    $flag=trim(exec('/usr/sbin/fw_printenv -n image_flag'));
+    if ($flag!="") {
+        if ($flag=="0") {
+            $version=trim(exec('/usr/sbin/fw_printenv -n version_0'));
+        } else if ($flag=="1") {
+            $version=trim(exec('/usr/sbin/fw_printenv -n version_1'));
+        }
+    }
+    if ($version!=""){
+        $date=getDateFromVersion($version);
+        if (!is_null($date)) {
+            $buildDate=date_format($date,'jS \of F Y h:i A');
+        }
+    }
+
+    $macAddress=exec('cat /sys/class/net/eth0/address');
+
+
+    return array("hwver"=>$hardwareVersion,
+        "ethaddr"=>$macAddress,
+        "build_date"=>$buildDate,
+        "platform_v"=>$version);
+}
+
+/*
+ * Get Data from File or Version
+ */
+function getDateFromVersion($version) {
+    $versionParts=explode("_",$version);
+    $date=null;
+    if (count($versionParts)>=3) { //Well formatted
+        $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
+    }
+    return $date;
+}
+
+/*
  * Parses the authorization header of a request and obtain the Baerer Token
  */
 function getBearerToken() {
@@ -199,4 +282,21 @@ function http_digest_parse($txt)
     }
 
     return $needed_parts ? false : $data;
+}
+
+/*
+ * Get Data using PHP curl
+ */
+function getUrlData($url) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_URL,$url);
+    $result=curl_exec($ch);
+    curl_close($ch);
+
+    if ($result!=null&&$result!="") {
+        return $result;
+    }
+    return null;
 }
