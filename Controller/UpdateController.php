@@ -12,33 +12,33 @@ class UpdateController {
     public function getLatestFirmwareVersionAction() {
         global $config;
         header('Content-Type: application/json');
-        $minerType=getMinerType();
-        $response=getUrlData($config["urlFirmwareVersions"]);
-        $versions=null;
+
         $latestVersion="";
         $latestVersionDate="";
         $latestUrl="";
         $latestInfo="";
-        $currentVersion="";
-        $currentVersionDate="";
         $isUpdated=true;
+
+
+        $minerType=getMinerType();
+        $hardwareVersion=getHardwareVersion();
+        $currentVersions=getVersions();
+        $currentVersion=$currentVersions["platform_v"];
+        $currentVersionDate=date_format(getDateFromVersion($currentVersion),'jS \of F Y h:i A');
+
+        //Create GET params
+        $params=array("minerType"=>$minerType,"hardwareVersion"=>$hardwareVersion,"currentVersion"=>$currentVersion);
+
+        //Send GET request
+        $response=getUrlData($config["urlFirmwareVersions"],$params);
         if ($response!=null) {
             $versions = json_decode($response,true);
-            if ($versions!=null&&is_array($versions)&&array_key_exists($minerType, $versions)) {
-                $latestVersion = $versions[$minerType]["version"];
-                $latestUrl = $versions[$minerType]["url"];
-                $latestInfo = $versions[$minerType]["info"];
-                $latestVersionDate=getDateFromVersion($latestVersion);
-            }
-
-            //Get Current Versions
-            $currentVersions=getVersions();
-            $currentVersion=$currentVersions["platform_v"];
-            $currentVersionDate=getDateFromVersion($currentVersion);
-
-            //Compare Versions Dates
-            if ($latestVersionDate>$currentVersionDate) {
-                $isUpdated=false;
+            if ($versions!=null&&is_array($versions)) {
+                $latestVersion = $versions["version"];
+                $latestUrl = $versions["url"];
+                $latestInfo = $versions["info"];
+                $isUpdated = $versions["updated"];
+                $latestVersionDate=$versions["versionDate"];
             }
         }
 
@@ -46,11 +46,11 @@ class UpdateController {
             echo json_encode(array(
                 "success"=>true,
                 "version"=>$latestVersion,
-                "versionDate"=>date_format($latestVersionDate,'jS \of F Y h:i A'),
+                "versionDate"=>$latestVersionDate,
                 "url"=>$latestUrl,
                 "info"=>$latestInfo,
                 "currentVersion"=>$currentVersion,
-                "currentVersionDate"=>date_format($currentVersionDate,'jS \of F Y h:i A'),
+                "currentVersionDate"=>$currentVersionDate,
                 "isUpdated"=>$isUpdated
                 ));
         else

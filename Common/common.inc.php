@@ -285,13 +285,18 @@ function http_digest_parse($txt)
 }
 
 /*
- * Get Data using PHP curl
+ * Get Data using PHP curl with the defined $params
  */
-function getUrlData($url) {
+function getUrlData($url,$params=null) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_URL,$url);
+    if (is_null($params)) {
+        curl_setopt($ch, CURLOPT_URL, $url);
+    } else {
+        $query=http_build_query($params);
+        curl_setopt($ch, CURLOPT_URL, $url."?".$query);
+    }
     $result=curl_exec($ch);
     curl_close($ch);
 
