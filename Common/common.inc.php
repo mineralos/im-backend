@@ -255,6 +255,19 @@ function getDateFromVersion($version) {
 }
 
 /*
+ * Get Timestamp from File or Version
+ */
+function getTimestampFromVersion($version) {
+    $versionParts=explode("_",$version);
+    $date=null;
+    if (count($versionParts)>=3) { //Well formatted
+        $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
+        $timestamp = date_timestamp_get($date);
+    }
+    return $timestamp;
+}
+
+/*
  * Parses the authorization header of a request and obtain the Baerer Token
  */
 function getBearerToken() {
