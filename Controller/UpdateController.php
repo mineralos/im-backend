@@ -29,7 +29,7 @@ class UpdateController {
 
         //Create GET params
         $params=array("currentVersion"=>$currentVersion);
-        $response=getUrlData($config["urlFirmwareVersions"]."/".strtolower($minerType)."/".strtolower($hardwareVersion),$params);
+        $response=getUrlData($config["urlFirmwareVersions"]."/".strtolower($minerType)."/".strtolower($hardwareVersion)."/stable",$params);
 
         $isUpdated=false;
         if ($response!=null) {
