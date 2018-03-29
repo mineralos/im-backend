@@ -34,7 +34,7 @@ class UpdateController {
         $isUpdated=false;
         if ($response!=null) {
             $versions = json_decode($response,true);
-            if ($versions!=null&&is_array($versions)&&array_key_exists("version", $versions)) {
+            if ($versions!=null&&is_array($versions)) {
                 if (array_key_exists("version", $versions)) {
                     $latestVersion = $versions["version"];
                 }
