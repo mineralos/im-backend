@@ -31,7 +31,7 @@ class UpdateController {
         $params=array("currentVersion"=>$currentVersion);
         $response=getUrlData($config["urlFirmwareVersions"]."/".strtolower($minerType)."/".strtolower($hardwareVersion)."/stable",$params);
 
-        $isUpdated=false;
+        $isUpdated=true;
         if ($response!=null) {
             $versions = json_decode($response,true);
             if ($versions!=null&&is_array($versions)) {
@@ -53,8 +53,8 @@ class UpdateController {
                     $isUpdated = $versions["updated"];
                 } else {
                     //Compare Versions Dates
-                    if ($latestVersion===$currentVersion) {
-                        $isUpdated = true;
+                    if ($latestVersion!=$currentVersion) {
+                        $isUpdated=false;
                     }
                 }
             }
