@@ -28,35 +28,23 @@ class UpdateController {
         $currentVersionDate=getDateFromVersion($currentVersion);
 
         //Create GET params
-        $params=array("currentVersion"=>$currentVersion);
-        $response=getUrlData($config["urlFirmwareVersions"]."/".strtolower($minerType)."/".strtolower($hardwareVersion)."/stable",$params);
+        $params=array("minerType"=>$minerType,"hardwareVersion"=>$hardwareVersion,"currentVersion"=>$currentVersion);
+        $response=getUrlData($config["urlFirmwareVersions"],$params);
 
         $isUpdated=true;
         if ($response!=null) {
             $versions = json_decode($response,true);
-            if ($versions!=null&&is_array($versions)) {
-                if (array_key_exists("version", $versions)) {
-                    $latestVersion = $versions["version"];
-                }
-                if (array_key_exists("url", $versions)) {
-                    $latestUrl = $versions["url"];
-                }
-                if (array_key_exists("info", $versions)) {
-                    $latestInfo = $versions["info"];
-                }
-                if (array_key_exists("versionDate", $versions)) {
-                    $latestVersionDate=$versions["versionDate"];
-                } else {
-                    $latestVersionDate=getTimestampFromVersion($latestVersion);
-                }
-                if (array_key_exists("updated", $versions)) {
-                    $isUpdated = $versions["updated"];
-                } else {
-                    //Compare Versions Dates
-                    if ($latestVersion!=$currentVersion) {
-                        $isUpdated=false;
-                    }
-                }
+            if ($versions!=null&&is_array($versions)&&array_key_exists($minerType, $versions)) {
+                $latestVersion = $versions[$minerType]["version"];
+                $latestUrl = $versions[$minerType]["url"];
+                $latestInfo = $versions[$minerType]["info"];
+                $latestVersionDate=getDateFromVersion($latestVersion);
+            }
+
+
+            //Compare Versions Dates
+            if ($latestVersionDate>$currentVersionDate) {
+                $isUpdated=false;
             }
         }
 
@@ -64,7 +52,7 @@ class UpdateController {
             echo json_encode(array(
                 "success"=>true,
                 "version"=>$latestVersion,
-                "versionDate"=>date_format(date_create_from_format('U',$latestVersionDate),'jS \of F Y h:i A'),
+                "versionDate"=>date_format($latestVersionDate,'jS \of F Y h:i A'),
                 "url"=>$latestUrl,
                 "info"=>$latestInfo,
                 "currentVersion"=>$currentVersion,

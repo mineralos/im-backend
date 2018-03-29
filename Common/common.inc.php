@@ -255,19 +255,6 @@ function getDateFromVersion($version) {
 }
 
 /*
- * Get Timestamp from File or Version
- */
-function getTimestampFromVersion($version) {
-    $versionParts=explode("_",$version);
-    $date=null;
-    if (count($versionParts)>=3) { //Well formatted
-        $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
-        $timestamp = date_timestamp_get($date);
-    }
-    return $timestamp;
-}
-
-/*
  * Parses the authorization header of a request and obtain the Baerer Token
  */
 function getBearerToken() {
@@ -302,7 +289,7 @@ function http_digest_parse($txt)
  */
 function getUrlData($url,$params=null) {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     if (is_null($params)) {
         curl_setopt($ch, CURLOPT_URL, $url);
