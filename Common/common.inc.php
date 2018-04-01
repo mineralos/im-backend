@@ -302,7 +302,7 @@ function http_digest_parse($txt)
  */
 function getUrlData($url,$params=null) {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     if (is_null($params)) {
         curl_setopt($ch, CURLOPT_URL, $url);
