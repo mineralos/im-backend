@@ -85,8 +85,15 @@ function getLoggedUser() {
             if (isset($_SERVER['PHP_AUTH_USER'])&&isset($_SERVER['PHP_AUTH_PW'])) {
                 $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_SERVER['PHP_AUTH_USER']);
                 $users=array();
-                if (file_exists($config["usersFile"]))
+                if (file_exists($config["usersFile"])) {
                     $configContent=@file_get_contents($config["usersFile"]);
+                } else {
+                    if ($username == $config["userAdmin"] || $username == $config["userGuest"]) {
+                        return $username;
+                    } else {
+                        return null;
+                    }
+                }
                 if (isset($configContent)&&$configContent!=null&&$configContent!="") {
                     $users = json_decode($configContent, true);
                 }
