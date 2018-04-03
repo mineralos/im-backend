@@ -84,25 +84,26 @@ class ConfigController {
      * custom Pll and Vdd values
      */
     private function hasAgeingConfig($backup=false) {
+        global $config;
         $needed="Pll"; //Indicate if we have predefined Freq and Volt
-        $config=null;
+        $configPointer=null;
         if ($backup) {
             if (file_exists($config["backupConfigFile"])) {
                 $bkpConfig = null;
                 $configContent = @file_get_contents($config["backupConfigFile"]);
-                if ($configContent != null && $configContent != "") {
+                if (!is_null($configContent) && $configContent != "") {
+
                     $bkpConfig = json_decode($configContent, true);
                 }
                 if (!is_null($bkpConfig))
-                    $config=$bkpConfig;
+                    $configPointer=$bkpConfig;
             }
         } else {
-            $config = $this->config;
+            $configPointer = $this->config;
         }
-
-        if (!is_null($config)&&is_array($config)) {
-            foreach ($config as $key=>$value) {
-                if (strpos($key,$needed)>0) {
+        if (!is_null($configPointer)&&is_array($configPointer)) {
+            foreach ($configPointer as $key=>$value) {
+                if (strpos($key,$needed)!==false) {
                     return true;
                 }
             }
@@ -125,7 +126,7 @@ class ConfigController {
             }
             if (!is_null($bkpConfig)) {
                 foreach ($bkpConfig as $key => $value) {
-                    if (strpos($key, "Vol") > 0 || strpos($key, "Pll") > 0) { //Doit this way to support multiple miners types
+                    if (strpos($key, "Vol") !== false || strpos($key, "Pll") !== false) { //Do this way to support multiple miners types
                         $this->config[$key] = $value;
                         $updated = true;
                     }
@@ -151,14 +152,13 @@ class ConfigController {
     public function setAutoTuneConfigAction() {
         global $config;
         header('Content-Type: application/json');
-
         if (isset($_POST["autotune"])) {
+            $updated=false;
+            //Restore values from backup
+            if (!$this->hasAgeingConfig()&&$this->hasAgeingConfig(true)) {
+                $updated=$this->restoreAgeingBackup();
+            }
             if ($_POST["autotune"]=="true") {
-                //Restore values from backup
-                $updated=false;
-                if (!$this->hasAgeingConfig()&&$this->hasAgeingConfig(true)) {
-                    $updated=$this->restoreAgeingBackup();
-                }
                 //Unset noauto key
                 if (isset($this->config[getMinerType()."noauto"])) {
                     unset($this->config[getMinerType() . "noauto"]);
@@ -173,6 +173,7 @@ class ConfigController {
                     copy($config["configFile"],$config["backupConfigFile"]);
                     $updated=true;
                 }
+
                 $this->config[getMinerType() . "noauto"]=true;
                 $this->save();
                 echo json_encode(array("success"=>true));
