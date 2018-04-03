@@ -147,8 +147,71 @@ class MinerController {
     public function getSelfTestStatusAction() {
         global $config;
         header('Content-Type: application/json');
+
+        //Check if its running
         $isRunning=file_exists($config["selfTestLockFile"]);
-        echo json_encode(array("success"=>true,"running"=>$isRunning));
+
+        //Get progress from Log File
+        $stepsLine="";
+        $stepLine="";
+        $testPeriodLine="";
+        $step=0;
+        $steps=0;
+        $testPeriod=0;
+        $handle = fopen($config["selfTestLogFile"], "r");
+        if ($handle) {
+            $i=0;
+            while (($line = fgets($handle)) !== false) {
+                $i++;
+                if (strpos($line,"Steps=")!== false) {
+                    $stepsLine=trim($line);
+                } else if (strpos($line,"Step=")!== false) {
+                    $stepLine=trim($line);
+                } else if (strpos($line,"TestPeriod=")!== false) {
+                    $testPeriodLine=trim($line);
+                }
+            }
+            fclose($handle);
+        }
+        if ($stepsLine!="") {
+            $lineParts = explode("=", $stepsLine);
+            $steps = intval($lineParts[1]);
+        }
+        if ($stepLine!="") {
+            $lineParts = explode("=", $stepLine);
+            $step = intval($lineParts[1]);
+        }
+        if ($testPeriodLine!="") {
+            $lineParts = explode("=", $testPeriodLine);
+            $testPeriod = intval($lineParts[1]);
+        }
+
+
+
+        //Get Stats from CgMiner
+        $chains=array();
+        if (isset($response)&&is_array($response)&&array_key_exists("STATS",$response)) {
+            foreach($response["STATS"] as $chainStats) {
+                $volt=0;
+                $chainVolt=0;
+                $hashRate=0;
+                if (is_array($chainStats)&&array_key_exists("Num active chips",$chainStats)) {
+                    $numOfChips=$chainStats["Num active chips"];
+                    for ($i=0;$i<$numOfChips;$i++) {
+                        $key=sprintf("%02d nVol", $i);
+                        if (array_key_exists($key,$chainStats)&&intval($chainStats[$key])>0) {
+                            $volt+=intval($chainStats[$key]);
+                        }
+                    }
+                    $chainVolt=$volt/$numOfChips;
+                }
+                if (is_array($chainStats)&&array_key_exists("MHS av",$chainStats)&&intval($chainStats["MHS av"])>0) {
+                    $hashRate=intval($chainStats["MHS av"]);
+                }
+                $chains[]=array("volt"=>$chainVolt,"hashRate"=>$hashRate);
+            }
+        }
+        echo json_encode(array("success"=>true,"running"=>$isRunning,"steps"=>$steps,"step"=>$step,"testPeriod"=>$testPeriod,"chains"=>$chains));
     }
 
     /*

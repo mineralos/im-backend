@@ -49,12 +49,13 @@ class StatusController {
         $response=$service->call("stats");
 
 
-        if (is_array($response)&&isset($response)) {
+        if (isset($response)&&is_array($response)) {
             $response["success"]=true;
             echo json_encode($response);
         } else {
             echo json_encode(array("success" => false));
         }
     }
+
 
 }
