@@ -88,8 +88,10 @@ function getLoggedUser() {
                 if (file_exists($config["usersFile"])) {
                     $configContent=@file_get_contents($config["usersFile"]);
                 } else {
-                    if ($username == $config["userAdmin"] || $username == $config["userGuest"]) {
-                        return $username;
+                    if ($username == $config["userAdmin"] && $_SERVER['PHP_AUTH_PW'] == $config["passwordAdmin"]) {
+                        return $config["userAdmin"];
+                    } elseif ($username == $config["userGuest"] && $_SERVER['PHP_AUTH_PW'] == $config["passwordGuest"]) {
+                        return $config["userGuest"];
                     } else {
                         return null;
                     }
