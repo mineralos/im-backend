@@ -190,14 +190,15 @@ function getHardwareVersion() {
  */
 function getMinerType() {
     global $config;
-    $fileContent=@file_get_contents($config["minerTypeFile"]);
-    $type="";
+    $fileContent=@file_get_contents($config["hardwareVersionFile"]);
+    $typeVersion="";
     if ($fileContent!=null&&strlen($fileContent)>0) {
-        $type=trim($fileContent);
+        $hwVersionParts=explode(" ",trim($fileContent));
+        $typeVersionParts=explode(".",trim($hwVersionParts[1]));
+        $typeVersion=strtoupper($typeVersionParts[0]);
     }
-    return $type;
+    return $typeVersion;
 }
-
 
 /*
  * Get Versions Array
