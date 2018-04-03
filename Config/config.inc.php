@@ -31,3 +31,4 @@ $config["urlFirmwareVersions"]="https://download.halongmining.com/v1/update";
 $config["selfTestCmd"]="/bin/dm-selftest --production";
 $config["selfTestLockFile"]="/tmp/ageing_lock";
 $config["selfTestLogFile"]="/tmp/ageing.log";
+$config["selfTestProgressFile"]="/tmp/ageing_progress.log";

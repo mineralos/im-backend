@@ -168,12 +168,6 @@ class ConfigController {
                     $this->save();
                 echo json_encode(array("success"=>true));
             } else if ($_POST["autotune"]=="false"){
-                //Backup Ageing Parameters
-                if ($this->hasAgeingConfig()) {
-                    copy($config["configFile"],$config["backupConfigFile"]);
-                    $updated=true;
-                }
-
                 $this->config[getMinerType() . "noauto"]=true;
                 $this->save();
                 echo json_encode(array("success"=>true));

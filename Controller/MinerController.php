@@ -154,11 +154,9 @@ class MinerController {
         //Get progress from Log File
         $stepsLine="";
         $stepLine="";
-        $testPeriodLine="";
         $step=0;
         $steps=0;
-        $testPeriod=0;
-        $handle = fopen($config["selfTestLogFile"], "r");
+        $handle = fopen($config["selfTestProgressFile"], "r");
         if ($handle) {
             $i=0;
             while (($line = fgets($handle)) !== false) {
@@ -167,8 +165,6 @@ class MinerController {
                     $stepsLine=trim($line);
                 } else if (strpos($line,"Step=")!== false) {
                     $stepLine=trim($line);
-                } else if (strpos($line,"TestPeriod=")!== false) {
-                    $testPeriodLine=trim($line);
                 }
             }
             fclose($handle);
@@ -181,11 +177,6 @@ class MinerController {
             $lineParts = explode("=", $stepLine);
             $step = intval($lineParts[1]);
         }
-        if ($testPeriodLine!="") {
-            $lineParts = explode("=", $testPeriodLine);
-            $testPeriod = intval($lineParts[1]);
-        }
-
 
 
         //Get Stats from CgMiner
@@ -211,7 +202,7 @@ class MinerController {
                 $chains[]=array("volt"=>$chainVolt,"hashRate"=>$hashRate);
             }
         }
-        echo json_encode(array("success"=>true,"running"=>$isRunning,"steps"=>$steps,"step"=>$step,"testPeriod"=>$testPeriod,"chains"=>$chains));
+        echo json_encode(array("success"=>true,"running"=>$isRunning,"steps"=>$steps,"step"=>$step,"chains"=>$chains));
     }
 
     /*
