@@ -15,6 +15,7 @@ use DragonMint\Helper\Router;
  */
 $loggedUser=getLoggedUser();
 if ($loggedUser=="expired") {
+    header('Content-Type: application/json');
     echo json_encode(array("success"=>false,"token"=>"expired"));
     return;
 }
@@ -125,4 +126,5 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 /*
  * If the request hit this place is because it didn't find a Route
  */
+header('Content-Type: application/json');
 echo json_encode(array("success"=>false,"message"=>"invalid request"));
