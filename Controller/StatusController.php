@@ -100,6 +100,7 @@ class StatusController {
     public function getHashRatesAction() {
         global $config;
         header('Content-Type: application/json');
+        $minTime=strtotime('-5 hours'); //Avoid NTP out of sync
         if (file_exists($config["statsJsonFile"])) {
             $configContent=@file_get_contents($config["statsJsonFile"]);
             if ($configContent!=null&&$configContent!="") {
@@ -110,25 +111,29 @@ class StatusController {
                     //detect max number of chains
                     $chains=0;
                     foreach ($jsonStats as $stats) {
-                        foreach ($stats as $statPerTime) {
-                            $timeChains=count((array)$statPerTime);
-                            if ($timeChains>$chains)
-                                $chains=$timeChains;
+                        foreach ($stats as $time=>$statPerTime) {
+                            if ($time>$minTime) { //Avoid NTP out of sync
+                                $timeChains = count((array)$statPerTime);
+                                if ($timeChains > $chains)
+                                    $chains = $timeChains;
+                            }
 
                         }
                     }
                     $timeI=0;
                     foreach ($jsonStats as $stats) {
                         foreach ($stats as $time=>$statPerTime) {
-                            $times[]=$time;
-                            for ($i=0;$i<$chains;$i++) {
-                                if (isset($statPerTime->{$i})) {
-                                    $chainsStats[$i][]=$statPerTime->{$i};
-                                } else {
-                                    $chainsStats[$i][]=0;
+                            if ($time>$minTime) { //Avoid NTP out of sync
+                                $times[] = $time;
+                                for ($i = 0; $i < $chains; $i++) {
+                                    if (isset($statPerTime->{$i})) {
+                                        $chainsStats[$i][] = $statPerTime->{$i};
+                                    } else {
+                                        $chainsStats[$i][] = 0;
+                                    }
                                 }
+                                $timeI++;
                             }
-                            $timeI++;
                         }
                     }
                 }
