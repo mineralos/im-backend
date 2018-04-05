@@ -54,9 +54,14 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
     //Ping
     $router->get('/api/ping', 'Network',"ping");
 
-    //Factory Stats
+    //CgMiner Stats Gateway
     $router->get('/api/stats', 'Status','getStats');
 
+    //Hash Rates Stats
+    $router->get('/api/getHashRates', 'Status','getHashRates');
+
+    //Hash Rates Stats
+    $router->get('/api/getDebugStats', 'Status','getDebugStats');
 
 }
 

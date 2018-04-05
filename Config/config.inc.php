@@ -32,3 +32,6 @@ $config["selfTestCmd"]="/bin/dm-selftest --production";
 $config["selfTestLockFile"]="/tmp/ageing_lock";
 $config["selfTestLogFile"]="/tmp/ageing.log";
 $config["selfTestProgressFile"]="/tmp/ageing_progress.log";
+
+//Stats
+$config["statsJsonFile"]="/tmp/stats.json";
