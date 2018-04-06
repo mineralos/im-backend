@@ -47,6 +47,24 @@ class MinerController {
     }
 
     /*
+     * Sends poweroff system call to the miner
+     */
+    public function poweroffAction() {
+        header('Content-Type: application/json');
+        shell_exec('sleep 4;/usr/sbin/poweroff >/dev/null 2>/dev/null &');
+        echo json_encode(array("success"=>true));
+    }
+
+    /*
+     * Restart cgminer
+     */
+    public function restartCgMinerAction() {
+        header('Content-Type: application/json');
+        shell_exec('/usr/bin/systemctl restart cgminer >/dev/null 2>/dev/null &');
+        echo json_encode(array("success"=>true));
+    }
+
+    /*
      * Reset to factory reset deleting all the content of /config and then reboot the miner
      */
     public function factoryResetAction() {

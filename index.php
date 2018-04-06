@@ -82,6 +82,12 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Reboot
     $router->get('/api/reboot', 'Miner',"reboot");
 
+    //Poweroff
+    $router->get('/api/poweroff', 'Miner',"poweroff");
+
+    //Restart CgMiner
+    $router->get('/api/restartCgMiner', 'Miner',"restartCgMiner");
+
     //Dump Logs
     $router->get('/api/getLogs', 'Miner','getLogs');
 
@@ -105,6 +111,7 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //Latest Firmware Version
     $router->get('/api/getLatestFirmwareVersion', 'Update','getLatestFirmwareVersion');
+
 
     /*
      * Interface with the old API
