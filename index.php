@@ -94,8 +94,8 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Factory Reset
     $router->get('/api/factoryReset', 'Miner','factoryReset');
 
-    //Miner Config has Ageing Parameters
-    $router->get('/api/hasAgeing', 'Config',"minerHasAgeingConfig");
+    //Miner Config has Auto Tune Enabled
+    $router->get('/api/getAutoTune', 'Config',"getAutoTuneConfig");
 
     //Returns true if self test is running or false if not
     $router->get('/api/selfTestStatus', 'Miner',"getSelfTestStatus");

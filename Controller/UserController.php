@@ -33,6 +33,7 @@ class UserController {
      */
     public function authAction() {
         global $config;
+        header('Content-Type: application/json');
         if (isset($_POST["username"])&&$_POST["username"]!=""&&isset($_POST["password"])&&$_POST["password"]!="") {
             $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
             foreach ($this->users as $user) {

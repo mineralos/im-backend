@@ -39,7 +39,6 @@ class ConfigController {
 
         $keysNeeded=array("Pool","UserName","Password");
         $newKeys=array("url","user","pass");
-        $numPools=0;
         $pools=array();
         for ($i=1;$i<=3;$i++) {
             $pool=array();
@@ -139,11 +138,11 @@ class ConfigController {
 
     /*
      * Returns a json with true or false depending if cgminer.conf have
-     * custom Pll and Vdd values
+     * t1_auto
      */
-    public function minerHasAgeingConfigAction() {
+    public function getAutoTuneConfigAction() {
         header('Content-Type: application/json');
-        echo json_encode(array("success"=>true,"hasAutoTune"=>$this->hasAutoTune(),"hasSelfTest"=>$this->hasAgeingConfig()||$this->hasAgeingConfig(true)));
+        echo json_encode(array("success"=>true,"hasAutoTune"=>$this->hasAutoTune()));
     }
 
     /*
