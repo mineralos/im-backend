@@ -9,6 +9,7 @@ class MinerController {
 
     }
 
+
     /*
      * Dump logs to a file and send it
      */

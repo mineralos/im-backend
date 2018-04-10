@@ -62,8 +62,10 @@ class StatusController {
      * with all the information obtained for debug page
      */
     public function getDebugStatsAction() {
-        $service = new CgminerService();
+        global $config;
         header('Content-Type: application/json');
+        // cgminer stats
+        $service = new CgminerService();
         $response=$service->call("stats");
 
         $stats=array();
@@ -86,11 +88,15 @@ class StatusController {
                     }
                 }
             }
-
-            echo json_encode(array("success"=>true,"boards"=>$stats));
-        } else {
-            echo json_encode(array("success" => false));
         }
+
+        // versions hashes
+        $hashes=array();
+        if (file_exists($config["gitHashes"])) {
+            $hashes=parse_ini_file($config["gitHashes"]);
+        }
+
+        echo json_encode(array("success"=>true,"boards"=>$stats,"hashes"=>array_change_key_case($hashes,CASE_LOWER)));
 
     }
 
