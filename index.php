@@ -97,15 +97,6 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Miner Config has Auto Tune Enabled
     $router->get('/api/getAutoTune', 'Config',"getAutoTuneConfig");
 
-    //Returns true if self test is running or false if not
-    $router->get('/api/selfTestStatus', 'Miner',"getSelfTestStatus");
-
-    //Start Self Test
-    $router->get('/api/startSelfTest', 'Miner',"startSelfTest");
-
-    //Get Self Test Logs
-    $router->get('/api/getSelfTestLog', 'Miner',"getSelfTestLog");
-
     //Set Auto Ageing Config
     $router->get('/api/setAutoTune', 'Config',"setAutoTuneConfig");
 

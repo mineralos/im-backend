@@ -49,14 +49,12 @@ class UpdateController {
                 } else {
                     $latestVersionDate=getTimestampFromVersion($latestVersion);
                 }
-                if (array_key_exists("updated", $versions)) {
-                    $isUpdated = $versions["updated"];
-                } else {
-                    //Compare Versions Dates
-                    if ($latestVersion===$currentVersion) {
-                        $isUpdated = true;
-                    }
+
+                //Compare Versions Dates
+                if (getTimestampFromVersion($latestVersion)>=$currentVersionDate) {
+                    $isUpdated = true;
                 }
+
             }
         }
 

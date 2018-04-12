@@ -19,20 +19,49 @@ class StatusController {
         $devs=@$response["devs"][0]["DEVS"];
         //look for the fans speed
         $fansSpeed=0;
+        $isTuning=false;
 
-        for ($i=0;$i<3;$i++) {
+        for ($i=0;$i<8;$i++) {
             if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"])) {
                 $stats = $response["stats"][0]["STATS"][$i];
-                if (intval($stats["Fan duty"]) > 0) {
+                if ($fansSpeed==0&&intval($stats["Fan duty"]) > 0) {
                     $fansSpeed = intval($stats["Fan duty"]);
-                    break;
+                }
+
+                // is tuning
+                if (
+                    ((isset($stats["VidOptimal"])&&$stats["VidOptimal"]===false)||
+                        (isset($stats["pllOptimal"])&&$stats["pllOptimal"]===false))
+                        &&isAutoTuneEnabled()) {
+                    $isTuning=true;
+                }
+
+
+
+            }
+        }
+
+        $hashRates=array();
+        for ($i=0;$i<8;$i++) {
+            if (isset($devs) && array_key_exists($i, $devs)) {
+                // look for hash rate
+                if (intval($devs[$i]["Device Elapsed"])<5) {
+                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 5s"];
+                } else if (intval($devs[$i]["Device Elapsed"])<15) {
+                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 1m"];
+                } else if (intval($devs[$i]["Device Elapsed"])<60) {
+                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 5m"];
+                } else {
+                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 15m"];
                 }
             }
         }
 
+
+
         $pools=@$response["pools"][0]["POOLS"];
         if (is_array($devs)&&is_array($pools)) {
-            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools, "HARDWARE"=>array("Fan duty"=>$fansSpeed)));
+            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools, "HARDWARE"=>array("Fan duty"=>$fansSpeed),"tuning"=>$isTuning, "hashrates"=>$hashRates));
         } else {
             echo json_encode(array("success" => false));
         }

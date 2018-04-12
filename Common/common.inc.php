@@ -328,3 +328,19 @@ function getUrlData($url,$params=null) {
     }
     return null;
 }
+
+/*
+ * Check if Auto Tune is Enabled
+ */
+function isAutoTuneEnabled() {
+    global $config;
+    $configContent=@file_get_contents($config["configFile"]);
+    if ($configContent!=null&&$configContent!="") {
+        $configArray = json_decode($configContent, true);
+        if (is_array($configArray)&&array_key_exists(getMinerType()."noauto",$configArray)) {
+            return false;
+        }
+
+    }
+    return true;
+}
