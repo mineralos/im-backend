@@ -44,18 +44,12 @@ class CgminerService {
         }
     }
 
-    function readSockLine($sock){
-        while($buf = @socket_read($sock, 1024, PHP_NORMAL_READ))
-            if($buf = trim($buf))
-                break;
 
-        return $buf;
-    }
 
     /*
      * Read one line from the received buffer of the cgminer API call
      */
-    public function readSockLine2($socket)
+    public function readSockLine($socket)
     {
         $line = '';
         while (true)
