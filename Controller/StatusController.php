@@ -44,17 +44,26 @@ class StatusController {
         $hashRates=array();
         for ($i=0;$i<8;$i++) {
             if (isset($devs) && array_key_exists($i, $devs)) {
+
                 // look for hash rate
                 $elapsed=intval($devs[$i]["Device Elapsed"]);
-                if ($elapsed<5*60) {
-                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 5s"];
-                } else if ($elapsed<15*60) {
-                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 1m"];
-                } else if ($elapsed<60*60) {
-                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 5m"];
+
+                if (array_key_exists("MHS 5m", $devs[$i])&&array_key_exists("MHS 15m", $devs[$i])) {
+                    if ($elapsed < 5 * 60) {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 5s"];
+                    } else if ($elapsed < 15 * 60) {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 1m"];
+                    } else if ($elapsed < 60 * 60) {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 5m"];
+                    } else {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 15m"];
+                    }
                 } else {
-                    $devs[$i]["Hash Rate"]=$devs[$i]["MHS 15m"];
+                    $devs[$i]["Hash Rate"] = $devs[$i]["MHS av"];
                 }
+
+
+
             }
         }
 
