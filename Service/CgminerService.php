@@ -32,8 +32,6 @@ class CgminerService {
                 $error = socket_strerror(socket_last_error());
                 return null;
             }
-            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
-            socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
             $res = @socket_connect($socket, $addr, $port);
             if ($res === false) {
                 $error = socket_strerror(socket_last_error());
@@ -46,10 +44,18 @@ class CgminerService {
         }
     }
 
+    function readSockLine($sock){
+        while($buf = @socket_read($sock, 1024, PHP_NORMAL_READ))
+            if($buf = trim($buf))
+                break;
+
+        return $buf;
+    }
+
     /*
      * Read one line from the received buffer of the cgminer API call
      */
-    public function readSockLine($socket)
+    public function readSockLine2($socket)
     {
         $line = '';
         while (true)
@@ -97,64 +103,5 @@ class CgminerService {
         return null;
     }
 
-    /*
-     * Original API function from cgminer sourte, should be deleted
-     */
-    public function requestOld($socket,$cmd)
-    {
-        try {
-            if ($socket != null)
-            {
-                socket_write($socket, $cmd, strlen($cmd));
-                $line = $this->readsockline($socket);
 
-                socket_close($socket);
-                if (strlen($line) == 0)
-                {
-                    return $line;
-                }
-                if (substr($line,0,1) == '{')
-                    return json_decode($line, true);
-                $data = array();
-                $objs = explode('|', $line);
-                foreach ($objs as $obj)
-                {
-                    if (strlen($obj) > 0)
-                    {
-                        $items = explode(',', $obj);
-                        $item = $items[0];
-                        $id = explode('=', $items[0], 2);
-                        if (count($id) == 1 or !is_numeric($id[1]))
-                            $name = $id[0];
-                        else
-                            $name = $id[0].$id[1];
-                        if (strlen($name) == 0)
-                            $name = 'null';
-                        if (isset($data[$name]))
-                        {
-                            $num = 1;
-                            while (isset($data[$name.$num]))
-                                $num++;
-                            $name .= $num;
-                        }
-                        $counter = 0;
-                        foreach ($items as $item)
-                        {
-                            $id = explode('=', $item, 2);
-                            if (count($id) == 2)
-                                $data[$name][$id[0]] = $id[1];
-                            else
-                                $data[$name][$counter] = $id[0];
-                            $counter++;
-                        }
-                    }
-                }
-                return $data;
-            }
-
-        } catch(\Exception $e) {
-            return null;
-        }
-        return null;
-    }
 }
