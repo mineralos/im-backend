@@ -83,18 +83,43 @@ class ConfigController {
         return false;
     }
 
-
     /*
-     * Returns a json with true or false depending if cgminer.conf have
-     * t1_auto
+     * Returns cgminer autotune mode
      */
     public function getAutoTuneConfigAction() {
         header('Content-Type: application/json');
         $mode="off";
+
         if ($this->hasAutoTune()) {
-            $mode=$this->hasAutoTuneEfficient()?"efficient":"default";
+            $type=getMinerType();
+            if (array_key_exists($type."efficient",$this->config)) {
+                $mode="efficient";
+            } else if (array_key_exists($type."performance",$this->config)) {
+                $mode="performance";
+            } else {
+                $mode="balanced";
+            }
         }
         echo json_encode(array("success"=>true,"autoTuneMode"=>$mode));
+    }
+
+    /*
+     * removes keys with specified names
+     */
+    private function clearAutoTuneOptions() {
+        $keys=array("noauto","efficient","performance");
+        $type=getMinerType();
+        $updated=false;
+        if (!is_null($this->config)&&is_array($this->config)) {
+            foreach ($keys as $key) {
+                if (array_key_exists($type.$key,$this->config)) {
+                    unset($this->config[$type.$key]);
+                    $updated=true;
+                }
+            }
+        }
+        return $updated;
+
     }
 
     /*
@@ -107,35 +132,22 @@ class ConfigController {
             $updated=false;
             switch($_POST["autotune"]) {
                 case "off":
-                    if (!isset($this->config[getMinerType()."noauto"])) {
-                        $this->config[getMinerType() . "noauto"]=true;
-                        $updated=true;
-                    }
-                    if (isset($this->config[getMinerType()."efficient"])) {
-                        unset($this->config[getMinerType() . "efficient"]);
-                        $updated=true;
-                    }
+                    $this->clearAutoTuneOptions();
+                    $this->config[getMinerType() . "noauto"]=true;
+                    $updated=true;
                 break;
-                case "default":
-                    if (isset($this->config[getMinerType()."noauto"])) {
-                        unset($this->config[getMinerType() . "noauto"]);
-                        $updated=true;
-                    }
-                    if (isset($this->config[getMinerType()."efficient"])) {
-                        unset($this->config[getMinerType() . "efficient"]);
-                        $updated=true;
-                    }
-                    break;
                 case "efficient":
-                    if (isset($this->config[getMinerType()."noauto"])) {
-                        unset($this->config[getMinerType() . "noauto"]);
-                        $updated=true;
-                    }
-                    if (!isset($this->config[getMinerType()."efficient"])) {
-                        $this->config[getMinerType() . "efficient"]=true;
-                        $updated=true;
-                    }
+                    $this->clearAutoTuneOptions();
+                    $this->config[getMinerType() . "efficient"]=true;
+                    $updated=true;
                     break;
+                case "balanced":
+                    $updated=$this->clearAutoTuneOptions();
+                    break;
+                case "performance":
+                    $this->clearAutoTuneOptions();
+                    $this->config[getMinerType() . "performance"]=true;
+                    $updated=true;
             }
 
             if ($updated) {
