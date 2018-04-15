@@ -51,7 +51,7 @@ class UpdateController {
                 }
 
                 //Compare Versions Dates
-                if ($latestVersionDate>=getTimestampFromVersion($currentVersion)) {
+                if (getTimestampFromVersion($currentVersion)>=$latestVersionDate) {
                     $isUpdated = true;
                 }
 
