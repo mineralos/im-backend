@@ -149,39 +149,30 @@ class StatusController {
         if (file_exists($config["statsJsonFile"])) {
             $configContent=@file_get_contents($config["statsJsonFile"]);
             if ($configContent!=null&&$configContent!="") {
-                $jsonStats = json_decode($configContent);
-                $chainsStats = array();
-                $times=array();
-                if (!is_null($jsonStats)) {
-                    //detect max number of chains
-                    $chains=0;
-                    foreach ($jsonStats as $stats) {
-                        foreach ($stats as $time=>$statPerTime) {
-                            if ($time>$minTime) { //Avoid NTP out of sync
-                                $timeChains = count((array)$statPerTime);
-                                if ($timeChains > $chains)
-                                    $chains = $timeChains;
-                            }
+                $jsonStats = json_decode($configContent,true);
 
-                        }
-                    }
-                    $timeI=0;
-                    foreach ($jsonStats as $stats) {
-                        foreach ($stats as $time=>$statPerTime) {
-                            if ($time>$minTime) { //Avoid NTP out of sync
-                                $times[] = $time;
-                                for ($i = 0; $i < $chains; $i++) {
-                                    if (isset($statPerTime->{$i})) {
-                                        $chainsStats[$i][] = $statPerTime->{$i};
-                                    } else {
-                                        $chainsStats[$i][] = 0;
-                                    }
-                                }
-                                $timeI++;
+                $times=array();
+                $chainsStats = array();
+
+                foreach ($jsonStats as $stats) {
+
+
+                    if (is_array($stats)&&count($stats)==1) {
+
+                        $statsTime=array_values($stats)[0];
+                        $time=array_keys($stats)[0];
+
+                        if ($time>$minTime) { //Avoid NTP out of sync
+                            if (!in_array($time,$times)) {
+                                $times[]=$time;
+                            }
+                            foreach ($statsTime as $chainId => $stat) {
+                                $chainsStats[$chainId][] = $stat;
                             }
                         }
                     }
                 }
+                
                 echo json_encode(array("success"=>true,"stats"=>$chainsStats,"times"=>$times));
                 return;
             }
