@@ -172,11 +172,39 @@ class StatusController {
                         }
                     }
                 }
-                
+
                 echo json_encode(array("success"=>true,"stats"=>$chainsStats,"times"=>$times));
                 return;
             }
         }
         echo json_encode(array("success"=>false,"message"=>"No data to show"));
+    }
+
+    /*
+     * Get Auto-Tuning Report
+     */
+    public function getAutoTuneStatusAction() {
+        header('Content-Type: application/json');
+        $service = new CgminerService();
+        $response=$service->call("stats");
+        $isTuning=false;
+        $isRunning=false;
+        if (isset($response["STATS"])) {
+            $isRunning=true;
+            for ($i = 0; $i < 8; $i++) {
+                if (array_key_exists($i, $response["STATS"])) {
+                    $stats = $response["STATS"][$i];
+                    // is tuning
+                    if (
+                        ((isset($stats["VidOptimal"]) && $stats["VidOptimal"] === false) ||
+                            (isset($stats["pllOptimal"]) && $stats["pllOptimal"] === false))
+                        && isAutoTuneEnabled()) {
+                        $isTuning = true;
+                        break;
+                    }
+                }
+            }
+        }
+        echo json_encode(array("success"=>true,"isRunning"=>$isRunning,"isTuning"=>$isTuning,"mode"=>getAutoTuneConfig()));
     }
 }

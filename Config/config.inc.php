@@ -3,6 +3,7 @@
 $config["cgminerPort"]=4028;
 $config["configDirectory"]="/config/";
 $config["configFile"]="/config/cgminer.conf";
+$config["profileFile"]="/config/profile.conf";
 $config["backupConfigFile"]="/config/.cgminer.conf";
 $config["usersFile"]="/config/web-users.json";
 $config["buildFile"]="/etc/os-release";

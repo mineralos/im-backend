@@ -64,50 +64,17 @@ class ConfigController {
     }
 
     /*
-     * Check if AutoTune is enabled
-     */
-    private function hasAutoTune() {
-        if (isset($this->config)&&is_array($this->config)&&array_key_exists(getMinerType()."noauto",$this->config)) {
-            return false;
-        }
-        return true;
-    }
-
-    /*
-     * Check if AutoTune is in Efficient Mode
-     */
-    private function hasAutoTuneEfficient() {
-        if (isset($this->config)&&is_array($this->config)&&array_key_exists(getMinerType()."efficient",$this->config)) {
-            return true;
-        }
-        return false;
-    }
-
-    /*
      * Returns cgminer autotune mode
      */
     public function getAutoTuneConfigAction() {
-        header('Content-Type: application/json');
-        $mode="off";
-
-        if ($this->hasAutoTune()) {
-            $type=getMinerType();
-            if (array_key_exists($type."efficient",$this->config)) {
-                $mode="efficient";
-            } else if (array_key_exists($type."performance",$this->config)) {
-                $mode="performance";
-            } else {
-                $mode="balanced";
-            }
-        }
-        echo json_encode(array("success"=>true,"autoTuneMode"=>$mode));
+        echo json_encode(array("success"=>true,"autoTuneMode"=>getAutoTuneConfig()));
     }
 
     /*
      * removes keys with specified names
      */
     private function clearAutoTuneOptions() {
-        $keys=array("noauto","efficient","performance");
+        $keys=array("noauto","efficient","factory","performance");
         $type=getMinerType();
         $updated=false;
         if (!is_null($this->config)&&is_array($this->config)) {
@@ -130,27 +97,37 @@ class ConfigController {
         header('Content-Type: application/json');
         if (isset($_POST["autotune"])) {
             $updated=false;
+            $mode="";
             switch($_POST["autotune"]) {
-                case "off":
-                    $this->clearAutoTuneOptions();
-                    $this->config[getMinerType() . "noauto"]=true;
-                    $updated=true;
-                break;
                 case "efficient":
+                    $mode="efficient";
                     $this->clearAutoTuneOptions();
                     $this->config[getMinerType() . "efficient"]=true;
                     $updated=true;
                     break;
                 case "balanced":
+                    $mode="balanced";
                     $updated=$this->clearAutoTuneOptions();
                     break;
+                case "factory":
+                    $mode="factory";
+                    $this->clearAutoTuneOptions();
+                    $this->config[getMinerType() . "factory"]=true;
+                    $updated=true;
+                    break;
                 case "performance":
+                    $mode="performance";
                     $this->clearAutoTuneOptions();
                     $this->config[getMinerType() . "performance"]=true;
                     $updated=true;
             }
 
             if ($updated) {
+                //Save Profile Setting
+                $profile=array("mode"=>$mode);
+                file_put_contents($config["profileFile"],json_encode($profile));
+
+                //Save CgMiner config
                 $this->save();
             }
             echo json_encode(array("success"=>true));

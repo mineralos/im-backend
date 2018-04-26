@@ -97,8 +97,11 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Miner Config has Auto Tune Enabled
     $router->get('/api/getAutoTune', 'Config',"getAutoTuneConfig");
 
-    //Set Auto Ageing Config
+    //Set Auto Tune Config
     $router->get('/api/setAutoTune', 'Config',"setAutoTuneConfig");
+
+    //Get Auto Tune Status
+    $router->get('/api/getAutoTuneStatus', 'Status',"getAutoTuneStatus");
 
     //Latest Firmware Version
     $router->get('/api/getLatestFirmwareVersion', 'Update','getLatestFirmwareVersion');

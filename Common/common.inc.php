@@ -344,3 +344,21 @@ function isAutoTuneEnabled() {
     }
     return true;
 }
+
+/*
+ * Returns cgminer autotune mode
+ */
+function getAutoTuneConfig() {
+    global $config;
+    header('Content-Type: application/json');
+
+    $mode="factory"; //default
+    $configContent=@file_get_contents($config["profileFile"]);
+    if ($configContent!=null&&$configContent!="") {
+        $profileFile = json_decode($configContent, true);
+        if (!is_null($profileFile)&&isset($profileFile["mode"])) {
+            $mode=$profileFile["mode"];
+        }
+    }
+    return $mode;
+}
