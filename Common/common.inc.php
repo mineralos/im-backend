@@ -352,7 +352,7 @@ function getAutoTuneConfig() {
     global $config;
     header('Content-Type: application/json');
 
-    $mode="factory"; //default
+    $mode="balanced"; //default
     $configContent=@file_get_contents($config["profileFile"]);
     if ($configContent!=null&&$configContent!="") {
         $profileFile = json_decode($configContent, true);
