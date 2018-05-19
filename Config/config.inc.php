@@ -20,8 +20,8 @@ $config["logsDumpedFile"]="/tmp/miner.log";
 //Default Passwords in Case Missing or Corrupted Users File
 $config["userAdmin"]="admin";
 $config["userGuest"]="guest";
-$config["passwordAdmin"]="innoadmin";
-$config["passwordGuest"]="innoguest";
+$config["passwordAdmin"]="admin";
+$config["passwordGuest"]="guest";
 
 //Versions
 $config["hardwareVersionFile"]="/etc/hwrevision";
