@@ -104,9 +104,9 @@ function getLoggedUser() {
                     if ($username == $user["username"]) {
                         if (generatePasswordHash($_SERVER['PHP_AUTH_PW'])==$user["password"]) {
                             return $user["username"];
-                        } elseif (generatePasswordHash($config["passwordAdmin"])==$user["password"]) {
+                        } elseif ($username == $config["userAdmin"] && generatePasswordHash($config["passwordAdmin"])==$user["password"]) {
                             return $user["username"];
-                        } elseif (generatePasswordHash($config["passwordGuest"])==$user["password"]) {
+                        } elseif ($username == $config["userGuest"] && generatePasswordHash($config["passwordGuest"])==$user["password"]) {
                             return $user["username"];
                         } else {
                             return null;
