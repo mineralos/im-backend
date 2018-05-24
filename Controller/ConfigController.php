@@ -79,9 +79,19 @@ class ConfigController {
         $updated=false;
         if (!is_null($this->config)&&is_array($this->config)) {
             foreach ($keys as $key) {
-                if (array_key_exists($type.$key,$this->config)) {
+                /*if (array_key_exists($type.$key,$this->config)) {
                     unset($this->config[$type.$key]);
                     $updated=true;
+	    }*/
+        //keys
+                $array_keys = array_keys($this->config);
+                foreach ($array_keys as $array_key) 
+                {
+                    if(strpos($array_key, $key) !== FALSE)
+                    {
+                        unset($this->config[$array_key]);
+                        $updated=true;
+                    }
                 }
             }
         }
