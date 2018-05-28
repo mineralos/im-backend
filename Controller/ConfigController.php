@@ -112,7 +112,7 @@ class ConfigController {
                 case "efficient":
                     $mode="efficient";
                     $this->clearAutoTuneOptions();
-                    $this->config[getMinerType() . "efficient"]=true;
+                    $this->config["efficient"]=true;
                     $updated=true;
                     break;
                 case "balanced":
@@ -122,13 +122,13 @@ class ConfigController {
                 case "factory":
                     $mode="factory";
                     $this->clearAutoTuneOptions();
-                    $this->config[getMinerType() . "factory"]=true;
+                    $this->config["factory"]=true;
                     $updated=true;
                     break;
                 case "performance":
                     $mode="performance";
                     $this->clearAutoTuneOptions();
-                    $this->config[getMinerType() . "performance"]=true;
+                    $this->config["performance"]=true;
                     $updated=true;
             }
 
@@ -164,6 +164,55 @@ class ConfigController {
         return ($returnVar==0);
     }
 
+    /*
+     * Return the freq and vol from the cgminer config file in JSON format
+     */
+    public function getFreqVolAction() 
+    {
+        header('Content-Type: application/json');
+        if (isset($this->config)&&isset($this->config["T1Pll1"])&&isset($this->config["T1VID1"])) 
+        {
+            echo json_encode(array("success" => true, "freq" => $this->config["T1Pll1"], "vol" => $this->config["T1VID1"]), JSON_UNESCAPED_SLASHES);
+        } 
+        else 
+        {
+            echo json_encode(array("success" => false, "message" => "missing configuration"));
+        }
+    }
 
+    /*
+     * Update the freq and vol received ina POST request and
+     * update the config file, then restarts cgminer
+     */
+    public function setFreqVolAction() 
+    {
+        header('Content-Type: application/json');
+
+        /*一共八个pll和vid，现在暂时都相同*/
+        $pll_num = 8;
+        $vid_num = 8;
+
+        $pll_value  = htmlspecialchars($_POST['Freq']);
+        $vid_value  = htmlspecialchars($_POST['Vol']);
+        // 赋值Pll
+        for ($i=1;$i<=$pll_num;$i++) 
+        {
+            $this->config["T1Pll".$i] = $pll_value;
+        }
+        // 赋值VID
+        for ($i=1;$i<=$vid_num;$i++) 
+        {
+            $this->config["T1VID".$i] = $vid_value;
+        }
+
+        // if (is_null($this->save())) 
+        // {
+        //     echo json_encode(array("success"=>false,"message"=>"reboot manually"));
+        // } 
+        // else 
+        // {
+        //     echo json_encode(array("success"=>true));
+        // }
+    }
 
 }

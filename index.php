@@ -106,7 +106,11 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
     //Latest Firmware Version
     $router->get('/api/getLatestFirmwareVersion', 'Update','getLatestFirmwareVersion');
 
+    //get freq and vol api
+    $router->get('/api/getFreqVol', 'Config','getFreqVol');
 
+    //set freq and vol api
+    $router->get('/api/setFreqVol', 'Config','setFreqVol');
     /*
      * Interface with the old API
      */
