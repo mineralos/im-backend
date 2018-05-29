@@ -82,8 +82,8 @@ class ConfigController {
                 /*if (array_key_exists($type.$key,$this->config)) {
                     unset($this->config[$type.$key]);
                     $updated=true;
-	    }*/
-        //keys
+	               }*/
+                //keys
                 $array_keys = array_keys($this->config);
                 foreach ($array_keys as $array_key) 
                 {
@@ -108,11 +108,12 @@ class ConfigController {
         if (isset($_POST["autotune"])) {
             $updated=false;
             $mode="";
+            $prefix = "T1";
             switch($_POST["autotune"]) {
                 case "efficient":
                     $mode="efficient";
                     $this->clearAutoTuneOptions();
-                    $this->config["efficient"]=true;
+                    $this->config[$prefix."efficient"]=true;
                     $updated=true;
                     break;
                 case "balanced":
@@ -122,13 +123,13 @@ class ConfigController {
                 case "factory":
                     $mode="factory";
                     $this->clearAutoTuneOptions();
-                    $this->config["factory"]=true;
+                    $this->config[$prefix."factory"]=true;
                     $updated=true;
                     break;
                 case "performance":
                     $mode="performance";
                     $this->clearAutoTuneOptions();
-                    $this->config["performance"]=true;
+                    $this->config[$prefix."performance"]=true;
                     $updated=true;
             }
 
