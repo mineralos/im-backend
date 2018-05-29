@@ -145,7 +145,7 @@ class StatusController {
     public function getHashRatesAction() {
         global $config;
         header('Content-Type: application/json');
-        $minTime=strtotime('-5 hours'); //Avoid NTP out of sync
+        $minTime=strtotime('-24 hours'); //Avoid NTP out of sync
         if (file_exists($config["statsJsonFile"])) {
             $configContent=@file_get_contents($config["statsJsonFile"]);
             if ($configContent!=null&&$configContent!="") {
