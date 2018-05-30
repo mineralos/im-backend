@@ -1,6 +1,7 @@
 <?php
 
 $config["cgminerPort"]=4028;
+$config["dmmonitorPort"]=8001;
 $config["configDirectory"]="/config/";
 $config["configFile"]="/config/cgminer.conf";
 $config["profileFile"]="/config/profile.conf";

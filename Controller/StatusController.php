@@ -1,6 +1,7 @@
 <?php
 
 use DragonMint\Service\CgminerService;
+use DragonMint\Service\DMMonitorService;
 
 class StatusController {
 
@@ -206,5 +207,30 @@ class StatusController {
             }
         }
         echo json_encode(array("success"=>true,"isRunning"=>$isRunning,"isTuning"=>$isTuning,"mode"=>getAutoTuneConfig()));
+    }
+
+    /*
+     * Consumes light state from dm-monitor and create a JSON response
+     * with all the information obtained
+     */
+    public function SetMonitorAction() 
+    {
+        $service = new DMMonitorService();
+        header('Content-Type: application/json');
+        if(isset($_POST['red_light']))
+        {
+            $light_state = trim($_POST['red_light']);
+            $response=$service->call($light_state);
+            if (isset($response)&&is_array($response)) 
+            {
+                // $response["success"]=true;
+                echo json_encode($response);
+            } 
+            else 
+            {
+                echo json_encode(array("success" => false));
+            }            
+        }
+
     }
 }

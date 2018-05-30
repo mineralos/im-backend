@@ -3,7 +3,9 @@ namespace DragonMint;
 include __DIR__.'/Common/common.inc.php';
 include __DIR__.'/Config/config.inc.php';
 include __DIR__.'/Helper/Router.php';
+include __DIR__.'/Service/SocketFunc.php';
 include __DIR__.'/Service/CgminerService.php';
+include __DIR__.'/Service/DMMonitorService.php';
 require_once('vendor/autoload.php');
 
 
@@ -111,6 +113,9 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //set freq and vol api
     $router->get('/api/setFreqVol', 'Config','setFreqVol');
+
+    //get state from dm-monitor
+    $router->get('/api/SetMonitor', 'Status','SetMonitor');
     /*
      * Interface with the old API
      */
