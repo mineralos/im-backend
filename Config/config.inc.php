@@ -38,3 +38,6 @@ $config["selfTestProgressFile"]="/tmp/ageing_progress.log";
 
 //Stats
 $config["statsJsonFile"]="/tmp/stats.json";
+
+//err file
+$config["errfile"] = "/tmp/errcode";

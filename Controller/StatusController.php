@@ -233,4 +233,29 @@ class StatusController {
         }
 
     }
+
+    /*
+     * get msg from err file
+     */
+    public function getErrorMessageAction()
+    {
+        global $config;
+        // header('Content-Type: application/json');
+        if (file_exists($config["errfile"]))
+        {
+            $configContent=@file_get_contents($config["errfile"]);
+            if ($configContent!=null&&$configContent!="")
+            {
+                $msg_arr = explode(PHP_EOL, $configContent);
+                $code = $errmsg = "";
+                $code = trim($msg_arr[0]);
+                $errmsg = isset($msg_arr[1]) ? $msg_arr[1] : "";
+
+                echo json_encode(array("success"=>true,"code"=>$code,"errmsg"=>$errmsg));
+                return;
+            }
+        }
+        echo json_encode(array("success"=>false));
+    }
+
 }

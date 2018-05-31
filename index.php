@@ -116,6 +116,9 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //get state from dm-monitor
     $router->get('/api/SetMonitor', 'Status','SetMonitor');
+
+    //get error message
+    $router->get('/api/getErrorMessage', 'Status','getErrorMessage');
     /*
      * Interface with the old API
      */
