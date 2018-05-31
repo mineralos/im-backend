@@ -255,7 +255,10 @@ class StatusController {
                 return;
             }
         }
-        echo json_encode(array("success"=>false));
+        else
+        {
+            echo json_encode(array("success"=>true,"code"=>"0","errmsg"=>""));
+        }
     }
 
 }
