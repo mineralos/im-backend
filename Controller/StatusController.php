@@ -106,7 +106,7 @@ class StatusController {
         header('Content-Type: application/json');
         // cgminer stats
         $service = new CgminerService();
-        $response=$service->call("stats");
+        $response=$service->call("dbgstats");
 
         $stats=array();
         if (isset($response)&&is_array($response)) {
