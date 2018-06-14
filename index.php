@@ -64,7 +64,9 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
     //Hash Rates Stats
     $router->get('/api/getDebugStats', 'Status','getDebugStats');
-
+    
+    //get miner unit
+    $router->get('/api/unit', 'Status','getMinerUnit');
 }
 
 /*

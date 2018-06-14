@@ -366,3 +366,54 @@ function getAutoTuneConfig() {
     }
     return $mode;
 }
+
+/**
+ * get the hash rate show
+ */
+function getHashRateShow($hashrate)
+{
+
+    $minertype = getMinerType();
+    $hash = 0;
+    $unit_h = "H/s";
+
+    $type_list = array(
+        "A4+"   =>  array(1000000,"H/s"),
+        "A6"    =>  array(1000000,"H/s"),
+        "A5"    =>  array(1000000,"H/s"),
+        "A5+"   =>  array(1000000,"H/s"),
+        "A5+"   =>  array(1000000,"H/s"),
+        "A8"    =>  array(1000,"H/s"),
+        "A8+"   =>  array(1000,"H/s"),
+        "T1"    =>  array(1000000,"H/s"),
+        "T2"    =>  array(1000000,"H/s"),
+        "B29+"  =>  array(1,"Sol/s"),
+        "D9"    =>  array(1000000,"H/s"),
+        "S11"   =>  array(1000000,"H/s"),
+    );
+
+    $unit_list = array("","K","M","G","T","P","E");
+
+    if(in_array($minertype,array_keys($type_list)))
+    {
+        $hash = $hashrate * $type_list[$minertype][0];
+    }
+
+    //get the unit
+    $cal_hash = $hash;
+    $unit_key = 0;
+    while($cal_hash >= 1000)
+    {
+        $cal_hash /= 1000;
+        $unit_key ++;
+    }
+    $unit_h = $type_list[$minertype][1];
+    $unit = $unit_list[$unit_key].$unit_h;
+    return array(
+        "hash_rate" =>  $hash,
+        "cal_hash"  =>  $cal_hash,
+        "unit"      =>  $unit,
+        "unit_h"    =>  $unit_h
+    );
+
+}

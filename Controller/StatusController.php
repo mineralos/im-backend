@@ -63,7 +63,11 @@ class StatusController {
                     $devs[$i]["Hash Rate"] = $devs[$i]["MHS av"];
                 }
 
-
+                //new display
+                $new_display = getHashRateShow($devs[$i]["Hash Rate"]);
+                $devs[$i]["Hash Rate"] = $new_display['cal_hash'];
+                $devs[$i]["Unit"] = $new_display['unit'];
+                $devs[$i]["Hash Rate H"] = $new_display['hash_rate'];
 
             }
         }
@@ -168,7 +172,7 @@ class StatusController {
                                 $times[]=$time;
                             }
                             foreach ($statsTime as $chainId => $stat) {
-                                $chainsStats[$chainId][] = $stat;
+                                $chainsStats[$chainId][] = getHashRateShow($stat)['hash_rate'];
                             }
                         }
                     }
@@ -261,4 +265,12 @@ class StatusController {
         }
     }
 
+    /*
+     * get miner unit
+     */
+    public function getMinerUnitAction()
+    {
+        header('Content-Type: application/json');
+        echo json_encode(array("success"=>true,"unit"=>getHashRateShow(0)['unit_h']));
+    }
 }
