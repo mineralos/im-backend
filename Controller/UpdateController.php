@@ -28,8 +28,10 @@ class UpdateController {
         $currentVersionDate=getDateFromVersion($currentVersion);
 
         //Create GET params
-        $params=array("currentVersion"=>$currentVersion);
-        $response=getUrlData($config["urlFirmwareVersions"]."/".strtolower($minerType)."/".strtolower($hardwareVersion)."/stable",$params);
+        $params=array(
+            "minertype"=>$minerType,
+            );
+        $response=getUrlData($config["urlFirmwareVersions"],$params);
 
         $isUpdated=false;
         if ($response!=null) {

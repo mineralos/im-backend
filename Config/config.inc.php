@@ -27,7 +27,7 @@ $config["passwordGuest"]="guest";
 //Versions
 $config["hardwareVersionFile"]="/etc/hwrevision";
 $config["minerTypeFile"]="/tmp/type";
-$config["urlFirmwareVersions"]="https://www.innosilicon.com/v1/update";
+$config["urlFirmwareVersions"]="http://www.innosilicon.com.cn/api/update.php";
 $config["gitHashes"]="/etc/git_hashes";
 
 //Self Test
