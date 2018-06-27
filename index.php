@@ -2,6 +2,7 @@
 namespace DragonMint;
 include __DIR__.'/Common/common.inc.php';
 include __DIR__.'/Config/config.inc.php';
+include __DIR__.'/Config/miner.inc.php';
 include __DIR__.'/Helper/Router.php';
 include __DIR__.'/Service/SocketFunc.php';
 include __DIR__.'/Service/CgminerService.php';

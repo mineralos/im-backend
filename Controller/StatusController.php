@@ -43,6 +43,7 @@ class StatusController {
         }
 
         $hashRates=array();
+        $total_hash_rate = 0;
         for ($i=0;$i<8;$i++) {
             if (isset($devs) && array_key_exists($i, $devs)) {
 
@@ -62,6 +63,8 @@ class StatusController {
                 } else {
                     $devs[$i]["Hash Rate"] = $devs[$i]["MHS av"];
                 }
+                //total hash
+                $total_hash_rate += $devs[$i]["Hash Rate"];
 
                 //new display
                 $new_display = getHashRateShow($devs[$i]["Hash Rate"]);
@@ -72,11 +75,16 @@ class StatusController {
             }
         }
 
+        //total hash api
+        $total_hash  = array();
+        $total_hash_show = getHashRateShow($total_hash_rate);
+        $total_hash['Hash Rate'] = $total_hash_show['cal_hash'];
+        $total_hash['Unit'] = $total_hash_show['unit'];
 
 
         $pools=@$response["pools"][0]["POOLS"];
         if (is_array($devs)&&is_array($pools)) {
-            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools, "HARDWARE"=>array("Fan duty"=>$fansSpeed),"tuning"=>$isTuning, "hashrates"=>$hashRates));
+            echo json_encode(array("success" => true, "DEVS" => $devs, "POOLS" => $pools, "HARDWARE"=>array("Fan duty"=>$fansSpeed),"tuning"=>$isTuning, "hashrates"=>$hashRates,"TotalHash"=>$total_hash));
         } else {
             echo json_encode(array("success" => false));
         }
