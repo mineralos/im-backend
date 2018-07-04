@@ -10,7 +10,7 @@ $config["usersFile"]="/config/web-users.json";
 $config["buildFile"]="/etc/os-release";
 $config["jwtKeyFile"]="/tmp/jwtK";
 $config["jwtTokenExpire"]=21600; //6 hours
-$config["serverName"]="InnoMiner";
+$config["serverName"]="AsicMiner";
 $config["salt"]="8985dee0f2bc1b7a895d58bc4811e373";
 
 $config["interfacesDirectory"]="/config/network/";
