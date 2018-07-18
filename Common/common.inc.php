@@ -383,9 +383,14 @@ function getHashRateShow($hashrate)
 
     if(in_array($minertype,array_keys($type_list)))
     {
-        $hash = $hashrate * $type_list[$minertype][0];
+        $miner_arr = $type_list[$minertype];
+    }
+    else
+    {
+        $miner_arr = $type_list['Default'];
     }
 
+    $hash = $hashrate * $miner_arr[0];
     //get the unit
     $cal_hash = $hash;
     $unit_key = 0;
@@ -394,7 +399,7 @@ function getHashRateShow($hashrate)
         $cal_hash /= 1000;
         $unit_key ++;
     }
-    $unit_h = !empty($type_list[$minertype][1]) ? $type_list[$minertype][1] : $unit_h;
+    $unit_h = !empty($miner_arr[1]) ? $miner_arr[1] : $unit_h;
     $unit = $unit_list[$unit_key].$unit_h;
     return array(
         "hash_rate" =>  $hash,
