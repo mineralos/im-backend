@@ -35,7 +35,8 @@ class UserController {
         global $config;
         header('Content-Type: application/json');
         if (isset($_POST["username"])&&$_POST["username"]!=""&&isset($_POST["password"])&&$_POST["password"]!="") {
-            $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
+            // $username=preg_replace("/[^a-zA-Z0-9_\-]+/","",$_POST["username"]);
+            $username=$_POST["username"];
             foreach ($this->users as $user) {
                 if ($username==$user["username"]) {
                     if (generatePasswordHash($_POST["password"])==$user["password"]) {
