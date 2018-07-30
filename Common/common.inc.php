@@ -233,11 +233,29 @@ function getVersions() {
 
 
     $flag=trim(exec('/usr/sbin/fw_printenv -n image_flag'));
-    if ($flag!="") {
-        if ($flag=="0") {
-            $version=trim(exec('/usr/sbin/fw_printenv -n version_0'));
-        } else if ($flag=="1") {
-            $version=trim(exec('/usr/sbin/fw_printenv -n version_1'));
+    if ($flag!="")
+    {
+        $version_type = "";
+        if ($flag=="0")
+        {
+            $version_type="version_0";
+        }
+        else if ($flag=="1")
+        {
+            $version_type="version_1";
+        }
+        else if ($flag=="a")
+        {
+            $version_type="version_a";
+        }
+        else if ($flag=="b")
+        {
+            $version_type="version_b";
+        }
+
+        if($version_type != "")
+        {
+            $version=trim(exec('/usr/sbin/fw_printenv -n '.$version_type));
         }
     }
     if ($version!=""){
@@ -262,8 +280,17 @@ function getVersions() {
 function getDateFromVersion($version) {
     $versionParts=explode("_",$version);
     $date=null;
-    if (count($versionParts)>=3) { //Well formatted
-        $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
+    if (count($versionParts)>=3)
+    {
+        //Well formatted
+        if(count($versionParts) == 3)
+        {
+            $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
+        }
+        else if(count($versionParts) == 4)
+        {
+            $date = date_create_from_format('Ymd His', $versionParts[2] . " " . $versionParts[3]);
+        }
     }
     return $date;
 }
