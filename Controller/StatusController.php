@@ -282,4 +282,37 @@ class StatusController {
         header('Content-Type: application/json');
         echo json_encode(array("success"=>true,"unit"=>getHashRateShow(0)['unit_h']));
     }
+
+    /*
+     * get the lock state
+     */
+    public function getLockStateAction()
+    {
+        header('Content-Type: application/json');
+        $status = readlockstate();
+        if(strlen($status) > 0)
+        {
+            echo json_encode(array("success"=>true,"status"=>$status));
+        }
+        else
+        {
+            echo json_encode(array("success"=>false));
+        }
+    }
+
+    /*
+     * set the lock
+     */
+    public function setLockAction()
+    {
+        header('Content-Type: application/json');
+        if(setlockstate())
+        {
+            echo json_encode(array("success"=>true));
+        }
+        else
+        {
+            echo json_encode(array("success"=>false));
+        }
+    }
 }

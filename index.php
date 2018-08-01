@@ -122,6 +122,12 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //get error message
     $router->get('/api/getErrorMessage', 'Status','getErrorMessage');
+
+    //get lock state
+    $router->get('/api/getLockState', 'Status','getLockState');
+
+    //set lock state
+    $router->get('/api/setLock', 'Status','setLock');
     /*
      * Interface with the old API
      */

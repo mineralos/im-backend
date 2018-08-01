@@ -444,3 +444,35 @@ function getHashRateShow($hashrate)
     );
 
 }
+
+/**
+ * get the lock state
+ */
+function readlockstate()
+{
+    $flag=trim(exec('/sbin/flagutils read'));
+    if(isset($flag) && !empty($flag) && $flag == 1)
+    {
+        return "1";
+    }
+    else
+    {
+        return "0";
+    }
+}
+
+/**
+ * set the lock
+ */
+function setlockstate()
+{
+    exec('/sbin/flagutils set',$result,$status);
+    if(strlen($status) > 0 && $status == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
