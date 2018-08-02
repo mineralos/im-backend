@@ -36,12 +36,6 @@ class ConfigController {
      */
     public function updatePoolsAction() {
         header('Content-Type: application/json');
-        //judge the lock to set or not
-        if(readlockstate() == "1")
-        {
-            echo json_encode(array("success"=>false,"message"=>"error"));
-            exit();
-        }
         $keysNeeded=array("Pool","UserName","Password");
         $newKeys=array("url","user","pass");
         $pools=array();
@@ -61,10 +55,21 @@ class ConfigController {
                 $pools[]=$pool;
         }
         $this->config["pools"]=$pools;
-        if (is_null($this->save())) {
+        if (is_null($this->save()))
+        {
             echo json_encode(array("success"=>false,"message"=>"reboot manually"));
-        } else {
-            echo json_encode(array("success"=>true));
+        }
+        else
+        {
+            //judge the lock to set or not
+            if(readlockstate() == "1")
+            {
+                echo json_encode(array("success"=>true,"message"=>"lock"));
+            }
+            else
+            {
+                echo json_encode(array("success"=>true,"message"=>"nolock"));
+            }
         }
     }
 
