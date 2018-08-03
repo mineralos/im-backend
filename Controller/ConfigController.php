@@ -105,9 +105,10 @@ class ConfigController {
     public function setAutoTuneConfigAction() {
         global $config;
         header('Content-Type: application/json');
-        if (isset($_POST["autotune"])) {
+        if (isset($_POST["autotune"]) && isset($_POST['level'])) {
             $updated=false;
             $mode="";
+            $level = trim($_POST['level']);
             $prefix = "T1";
             switch($_POST["autotune"]) {
                 case "efficient":
@@ -132,10 +133,12 @@ class ConfigController {
                     $this->config[$prefix."performance"]=true;
                     $updated=true;
             }
+            //add mode level
+            $this->config[$prefix."adjust"]=$level;
 
             if ($updated) {
                 //Save Profile Setting
-                $profile=array("mode"=>$mode);
+                $profile=array("mode"=>$mode,"level"=>$level);
                 file_put_contents($config["profileFile"],json_encode($profile));
 
                 //Save CgMiner config

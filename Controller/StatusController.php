@@ -218,7 +218,8 @@ class StatusController {
                 }
             }
         }
-        echo json_encode(array("success"=>true,"isRunning"=>$isRunning,"isTuning"=>$isTuning,"mode"=>getAutoTuneConfig()));
+        $autotune_status = getAutoTuneConfig();
+        echo json_encode(array("success"=>true,"isRunning"=>$isRunning,"isTuning"=>$isTuning,"mode"=>$autotune_status['mode'],"level"=>$autotune_status['level']));
     }
 
     /*

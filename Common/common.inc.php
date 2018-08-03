@@ -379,19 +379,27 @@ function isAutoTuneEnabled() {
 /*
  * Returns cgminer autotune mode
  */
-function getAutoTuneConfig() {
+function getAutoTuneConfig()
+{
     global $config;
     header('Content-Type: application/json');
 
     $mode="factory"; //default
+    $level = "2"; //default level
     $configContent=@file_get_contents($config["profileFile"]);
-    if ($configContent!=null&&$configContent!="") {
+    if ($configContent!=null&&$configContent!="")
+    {
         $profileFile = json_decode($configContent, true);
-        if (!is_null($profileFile)&&isset($profileFile["mode"])) {
+        if (!is_null($profileFile)&&isset($profileFile["mode"]))
+        {
             $mode=$profileFile["mode"];
         }
+        if (!is_null($profileFile)&&isset($profileFile["level"]))
+        {
+            $level=$profileFile["level"];
+        }
     }
-    return $mode;
+    return array("mode"=>$mode,"level"=>$level);
 }
 
 /**
