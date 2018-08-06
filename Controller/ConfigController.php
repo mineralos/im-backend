@@ -105,10 +105,14 @@ class ConfigController {
     public function setAutoTuneConfigAction() {
         global $config;
         header('Content-Type: application/json');
-        if (isset($_POST["autotune"]) && isset($_POST['level'])) {
+        if (isset($_POST["autotune"])) {
             $updated=false;
             $mode="";
-            $level = trim($_POST['level']);
+            $level = "2";
+            if(isset($_POST['level']))
+            {
+                $level = trim($_POST['level']);
+            }
             $prefix = "T1";
             switch($_POST["autotune"]) {
                 case "efficient":

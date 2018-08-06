@@ -68,6 +68,9 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
     
     //get miner unit
     $router->get('/api/unit', 'Status','getMinerUnit');
+
+    //Get Auto Tune Status
+    $router->get('/api/getAutoTuneStatus', 'Status',"getAutoTuneStatus");
 }
 
 /*
@@ -104,9 +107,6 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //Set Auto Tune Config
     $router->get('/api/setAutoTune', 'Config',"setAutoTuneConfig");
-
-    //Get Auto Tune Status
-    $router->get('/api/getAutoTuneStatus', 'Status',"getAutoTuneStatus");
 
     //Latest Firmware Version
     $router->get('/api/getLatestFirmwareVersion', 'Update','getLatestFirmwareVersion');
