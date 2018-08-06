@@ -87,7 +87,7 @@ class UserController {
             echo json_encode(array("success"=>false,"message"=>"wrong current password"));
             return;
         }
-        if (!isset($_POST["user"])||($_POST["user"]!=$config["userAdmin"]&&$_POST["user"]!=$config["userGuest"])) {
+        if (!isset($_POST["user"])||($_POST["user"]!=$config["userAdmin"])) {
             echo json_encode(array("success"=>false,"message"=>"invalid user"));
             return;
         }
