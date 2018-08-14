@@ -72,7 +72,7 @@ class MinerController {
         global $config;
         header('Content-Type: application/json');
         // shell_exec('sleep 4; rm -rf '.$config["configDirectory"].'/*;/bin/systemctl reboot >/dev/null 2>/dev/null &');
-        shell_exec('sleep 4;cd '.$config["configDirectory"].';ls | grep -v "author.au" | xargs rm -rf;/bin/systemctl reboot >/dev/null 2>/dev/null &');
+        shell_exec('sleep 4;cd '.$config["configDirectory"].';ls | grep -v "author.au" | grep -v "cg.conf" | xargs rm -rf;/bin/systemctl reboot >/dev/null 2>/dev/null &');
         echo json_encode(array("success"=>true));
     }
 
