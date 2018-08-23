@@ -34,27 +34,82 @@ class ConfigController {
      * Update the pools received ina POST request and
      * update the config file, then restarts cgminer
      */
-    public function updatePoolsAction() {
+    public function updatePoolsAction()
+    {
         header('Content-Type: application/json');
         $keysNeeded=array("Pool","UserName","Password");
         $newKeys=array("url","user","pass");
         $pools=array();
-        for ($i=1;$i<=3;$i++) {
-            $pool=array();
-            foreach ($keysNeeded as $j=>$key) {
-                $val=null;
-                if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="") {
-                    $val=$_POST[$key . $i];
+        $lockstate = readlockstate();
+        if($lockstate == "1")
+        {
+            $pools = $this->config['pools'];
+
+            foreach ($pools as $key => $value) 
+            {
+                /**
+                 * store username
+                 */
+                //prefix
+                $old_username = explode(".", $value['user']);
+                $prefix = $old_username[0];
+
+                //suffix               
+                $user_name_arr = explode(".", $_POST['UserName'.($key+1)] ,2);
+                if(count($user_name_arr) == 1)
+                {
+                    $suffix = $user_name_arr[0];
                 }
-                if (is_null($val)) {
-                    $val="";
+                else
+                {
+                    if(strlen(trim($user_name_arr[1])) > 0)
+                    {
+                        $suffix = $user_name_arr[1];
+                    }
+                    else
+                    {
+                        $suffix = $user_name_arr[0];
+                    }
                 }
-                $pool[$newKeys[$j]]=$val;
+
+                //prefix + suffix
+                $new_user_name = $prefix .".". $suffix;
+                $pools[$key]['user'] =  $new_user_name;
+
+                /**
+                 * store password
+                 */
+                $pools[$key]['pass'] =  $_POST['Password'.($key+1)];
             }
-            if ($pool["url"]!=""&&$pool["user"]!=""&&$pool["pass"]!="")
-                $pools[]=$pool;
         }
+        else
+        {
+            for ($i=1;$i<=3;$i++)
+            {
+                $pool=array();
+                foreach ($keysNeeded as $j=>$key)
+                {
+                    $val=null;
+                    if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="")
+                    {
+                        $val=$_POST[$key . $i];
+                    }
+
+                    if (is_null($val))
+                    {
+                        $val="";
+                    }
+                    $pool[$newKeys[$j]]=$val;
+                }
+                if ($pool["url"]!=""&&$pool["user"]!=""&&$pool["pass"]!="")
+                {
+                    $pools[]=$pool;
+                }
+            }            
+        }
+
         $this->config["pools"]=$pools;
+
         if (is_null($this->save()))
         {
             echo json_encode(array("success"=>false,"message"=>"reboot manually"));
@@ -62,7 +117,7 @@ class ConfigController {
         else
         {
             //judge the lock to set or not
-            if(readlockstate() == "1")
+            if($lockstate == "1")
             {
                 echo json_encode(array("success"=>true,"message"=>"lock"));
             }
