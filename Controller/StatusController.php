@@ -315,4 +315,21 @@ class StatusController {
             echo json_encode(array("success"=>false));
         }
     }
+
+    /*
+     * get dna
+     */
+    public function getDNAAction()
+    {
+        header('Content-Type: application/json');
+        $dna_info = exec("cat /sys/class/misc/dna/dna",$output,$return_var);
+        if(!empty($dna_info) && strlen(trim($dna_info)) > 0)
+        {
+            echo json_encode(array("success"=>true,"dna"=>$dna_info));
+        }
+        else
+        {
+            echo json_encode(array("success"=>false));
+        }
+    }
 }

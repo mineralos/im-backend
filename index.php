@@ -128,6 +128,9 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //set lock state
     $router->get('/api/setLock', 'Status','setLock');
+
+    //get dna
+    $router->get('/api/getDNA', 'Status','getDNA');
     /*
      * Interface with the old API
      */
