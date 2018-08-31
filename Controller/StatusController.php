@@ -21,8 +21,8 @@ class StatusController {
         //look for the fans speed
         $fansSpeed=0;
         $isTuning=false;
-
-        for ($i=0;$i<8;$i++) {
+        $max_chain_num = 9;
+        for ($i=0;$i<$max_chain_num;$i++) {
             if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"])) {
                 $stats = $response["stats"][0]["STATS"][$i];
                 if ($fansSpeed==0&&intval($stats["Fan duty"]) > 0) {
@@ -44,7 +44,7 @@ class StatusController {
 
         $hashRates=array();
         $total_hash_rate = 0;
-        for ($i=0;$i<8;$i++) {
+        for ($i=0;$i<$max_chain_num;$i++) {
             if (isset($devs) && array_key_exists($i, $devs)) {
 
                 // look for hash rate
