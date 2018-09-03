@@ -71,6 +71,9 @@ if (!is_null($loggedUser)&&($loggedUser===$config["userGuest"]||$loggedUser==$co
 
     //Get Auto Tune Status
     $router->get('/api/getAutoTuneStatus', 'Status',"getAutoTuneStatus");
+
+    //Get runtime pools
+    $router->get('/api/getRuntimePools', 'Status',"getRuntimePools");
 }
 
 /*

@@ -332,4 +332,24 @@ class StatusController {
             echo json_encode(array("success"=>false));
         }
     }
+
+    /*
+     * get runtime pools
+     */
+    public function getRuntimePoolsAction()
+    {
+        $service = new CgminerService();
+        header('Content-Type: application/json');
+        $response=$service->call("pools");
+        $pools=@$response["POOLS"];
+
+        if(is_array($pools))
+        {
+            echo json_encode(array("success" => true, "POOLS" => $pools));
+        }
+        else
+        {
+            echo json_encode(array("success" => false));
+        }
+    }
 }
