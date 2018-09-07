@@ -306,6 +306,9 @@ class StatusController {
     public function setLockAction()
     {
         header('Content-Type: application/json');
+        /*****set record******/
+        writerecord($_POST,'lock',readlockstate(),1);
+        /*****set record******/
         if(setlockstate())
         {
             echo json_encode(array("success"=>true));

@@ -36,6 +36,10 @@ class NetworkController {
             $fileContent.="DHCP=yes\n";
             $fileContent.="[DHCP]\n";
             $fileContent.="ClientIdentifier=mac\n";
+            /*****set record******/
+            $record_net=getNetwork();
+            writerecord($_POST,'ip',json_encode(array("dhcp"=>$record_net['dhcp'],"ip"=>$record_net['ipaddress'])),'dhcp');
+            /*****set record******/
             file_put_contents($config["interfacesDirectory"].$config["interfacesFile"],$fileContent);
             echo json_encode(array("success"=>true));
         } else if ($_POST["dhcp"]=="static"){
@@ -69,9 +73,11 @@ class NetworkController {
 
             if (!file_exists($config["interfacesDirectory"]))
                 mkdir($config["interfacesDirectory"]);
-
+            /*****set record******/
+            $record_net=getNetwork();
+            writerecord($_POST,'ip',json_encode(array("dhcp"=>$record_net['dhcp'],"ip"=>$record_net['ipaddress'])),json_encode(array("dhcp"=>"static","ip"=>$_POST["ipaddress"])));
+            /*****set record******/
             file_put_contents($config["interfacesDirectory"].$config["interfacesFile"],$fileContent);
-
 
             echo json_encode(array("success"=>true));
 

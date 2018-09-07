@@ -53,6 +53,9 @@ class ConfigController {
             }
             if ($pool["url"]!=""&&$pool["user"]!=""&&$pool["pass"]!="")
                 $pools[]=$pool;
+            /*****set record******/
+            writerecord($_POST,'pool'.$i,stripslashes(json_encode($this->config["pools"][$i-1])),stripslashes(json_encode($pools[$i-1])));
+            /*****set record******/
         }
         $this->config["pools"]=$pools;
         if (is_null($this->save()))
@@ -150,11 +153,15 @@ class ConfigController {
             //add mode level
             $this->config[$prefix."adjust"]=$level;
 
+            //record
+            $beforerecord = getAutoTuneConfig();
             if ($updated) {
                 //Save Profile Setting
                 $profile=array("mode"=>$mode,"level"=>$level);
                 file_put_contents($config["profileFile"],json_encode($profile));
-
+                /*****set record******/
+                writerecord($_POST,'run_mode',json_encode($beforerecord),json_encode($profile));
+                /*****set record******/
                 //Save CgMiner config
                 $this->save();
             }

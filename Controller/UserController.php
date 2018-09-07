@@ -98,6 +98,8 @@ class UserController {
         $updatedPassword=false;
         $userPos=0;
 
+        //record
+        $before_record = json_encode($this->users[0]);
         foreach ($this->users as $user) {
             if ($_POST["user"] == $user["username"]) {
                 $this->users[$userPos]["password"]=generatePasswordHash($_POST["newPassword"]);
@@ -107,9 +109,13 @@ class UserController {
             $userPos++;
         }
         
-
+        //record
+        $after_record = json_encode($this->users[0]);
         if ($updatedPassword) {
             $this->save();
+            /*****set record******/
+            writerecord($_POST,'web_user',$before_record,$after_record);
+            /*****set record******/
             echo json_encode(array("success"=>true));
             return;
         } else {

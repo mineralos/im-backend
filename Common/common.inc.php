@@ -476,3 +476,46 @@ function setlockstate()
         return false;
     }
 }
+
+/**
+ * write record
+ */
+function writerecord($src,$section,$before,$after)
+{
+    //judge the source
+    $src_write = 1;
+    if(isset($src['src']))
+    {
+        if($src['src'] == 1 || $src['src'] == 2)
+        {
+            $src_write = $src['src'];
+        }
+        else
+        {
+            $src_write = 0;
+        }
+    }
+    $section_arr = array("pool1","pool2","pool3","ip","web_user","run_mode","lock");
+    if(in_array($section, $section_arr))
+    {
+        //section before after
+        if(strlen($section) > 0  && strlen($before) && strlen($after))
+        {
+            $cmd = "/sbin/events_record ".$src_write." ".$section." ".$before." ".$after;
+            exec($cmd,$result,$status);
+            if(strlen($status) > 0 && $status == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }        
+    }
+    else
+    {
+        return false;
+    }
+
+}
