@@ -27,33 +27,49 @@ class UpdateController {
         $currentVersion=$currentVersions["platform_v"];
         $currentVersionDate=getDateFromVersion($currentVersion);
 
+        // hwver
+        $platform = $currentVersions['hwver'];
         //Create GET params
         $params=array(
-            "minertype"=>$minerType,
+            "minertype" =>$minerType,
+            "platform"  =>$platform
             );
         $response=getUrlData($config["urlFirmwareVersions"],$params);
 
         $isUpdated=false;
-        if ($response!=null) {
+        if ($response!=null)
+        {
             $versions = json_decode($response,true);
-            if ($versions!=null&&is_array($versions)&&array_key_exists("version", $versions)) {
-                if (array_key_exists("version", $versions)) {
+            if ($versions!=null&&is_array($versions)&&array_key_exists("version", $versions))
+            {
+                $stable_version = $versions["stable_version"];
+                if (array_key_exists("version", $versions))
+                {
                     $latestVersion = $versions["version"];
                 }
-                if (array_key_exists("url", $versions)) {
+
+                if (array_key_exists("url", $versions))
+                {
                     $latestUrl = $versions["url"];
                 }
-                if (array_key_exists("info", $versions)) {
+
+                if (array_key_exists("info", $versions))
+                {
                     $latestInfo = $versions["info"];
                 }
-                if (array_key_exists("versionDate", $versions)) {
+
+                if (array_key_exists("versionDate", $versions))
+                {
                     $latestVersionDate=$versions["versionDate"];
-                } else {
-                    $latestVersionDate=getTimestampFromVersion($latestVersion);
+                }
+                else
+                {
+                    $latestVersionDate=getTimestampFromVersion($latestVersion,$platform);
                 }
 
                 //Compare Versions Dates
-                if (getTimestampFromVersion($currentVersion)>=$latestVersionDate) {
+                if (getTimestampFromVersion($currentVersion,$platform)>=$latestVersionDate || getTimestampFromVersion($currentVersion,$platform)>=getTimestampFromVersion($stable_version,$platform)) 
+                {
                     $isUpdated = true;
                 }
 

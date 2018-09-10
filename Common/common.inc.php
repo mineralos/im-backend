@@ -298,11 +298,22 @@ function getDateFromVersion($version) {
 /*
  * Get Timestamp from File or Version
  */
-function getTimestampFromVersion($version) {
+function getTimestampFromVersion($version,$platform)
+{
     $versionParts=explode("_",$version);
     $date=null;
-    if (count($versionParts)>=3) { //Well formatted
-        $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);
+    if (count($versionParts)>=3)
+    {
+        if(strtolower($platform) == 'soc')
+        {
+            //Well formatted
+            $date = date_create_from_format('Ymd His', $versionParts[2] . " " . $versionParts[3]);
+        }
+        else
+        {
+            //Well formatted
+            $date = date_create_from_format('Ymd His', $versionParts[1] . " " . $versionParts[2]);          
+        }
         $timestamp = date_timestamp_get($date);
     }
     return $timestamp;
