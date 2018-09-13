@@ -3,9 +3,11 @@
 use DragonMint\Service\CgminerService;
 use DragonMint\Service\DMMonitorService;
 
+
 class StatusController {
 
-
+    private $max_chain_num = 9;
+    private $config;
     /*
      * Consumes pools, devs, stats from cgminer API
      * and create a JSON response with all the information
@@ -21,11 +23,14 @@ class StatusController {
         //look for the fans speed
         $fansSpeed=0;
         $isTuning=false;
-        $max_chain_num = 9;
-        for ($i=0;$i<$max_chain_num;$i++) {
-            if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"])) {
+        
+        for ($i=0;$i<$this->max_chain_num;$i++)
+        {
+            if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"]))
+            {
                 $stats = $response["stats"][0]["STATS"][$i];
-                if ($fansSpeed==0&&intval($stats["Fan duty"]) > 0) {
+                if ($fansSpeed==0&&intval($stats["Fan duty"]) > 0)
+                {
                     $fansSpeed = intval($stats["Fan duty"]);
                 }
 
@@ -33,20 +38,20 @@ class StatusController {
                 if (
                     ((isset($stats["VidOptimal"])&&$stats["VidOptimal"]===false)||
                         (isset($stats["pllOptimal"])&&$stats["pllOptimal"]===false))
-                        &&isAutoTuneEnabled()) {
+                        &&isAutoTuneEnabled())
+                {
                     $isTuning=true;
                 }
-
-
 
             }
         }
 
         $hashRates=array();
         $total_hash_rate = 0;
-        for ($i=0;$i<$max_chain_num;$i++) {
-            if (isset($devs) && array_key_exists($i, $devs)) {
-
+        for ($i=0;$i<$this->max_chain_num;$i++)
+        {
+            if (isset($devs) && array_key_exists($i, $devs))
+            {
                 // look for hash rate
                 $elapsed=intval($devs[$i]["Device Elapsed"]);
 
@@ -71,7 +76,6 @@ class StatusController {
                 $devs[$i]["Hash Rate"] = $new_display['cal_hash'];
                 $devs[$i]["Unit"] = $new_display['unit'];
                 $devs[$i]["Hash Rate H"] = $new_display['hash_rate'];
-
             }
         }
 
@@ -325,7 +329,7 @@ class StatusController {
     public function getDNAAction()
     {
         header('Content-Type: application/json');
-        $dna_info = exec("cat /sys/class/misc/dna/dna",$output,$return_var);
+        $dna_info = getDNA_common();
         if(!empty($dna_info) && strlen(trim($dna_info)) > 0)
         {
             echo json_encode(array("success"=>true,"dna"=>$dna_info));
@@ -354,5 +358,168 @@ class StatusController {
         {
             echo json_encode(array("success" => false));
         }
+    }
+
+    /*
+     * get All info
+     */
+    public function getAllAction()
+    {
+        $service = new CgminerService();
+        header('Content-Type: application/json');
+        //param
+        $miner_type = "";
+        $fansSpeed=0;
+        $chain_rate = array();
+        $total_hash_rate = 0;
+        $total_hash = array();
+        $mac = "";
+        $hwver = "";
+        $uptime = "";
+        $network = "";
+        $running_mode = "";
+        $dna = "";
+        $pools_return = array();
+        // echo json_encode(array("time1"=>microtime()));
+        //////////////////////////////////////////
+        //1. get type
+        $miner_type = getMinerType();
+
+        // 2.1 chain hash rate
+        // 2.2 chain temp
+        // 2.3 fan speed
+        $response=$service->call("pools+devs+stats");
+        $devs=@$response["devs"][0]["DEVS"];
+        for ($i=0;$i<$this->max_chain_num;$i++)
+        {
+            //hash rate
+            if (isset($devs) && array_key_exists($i, $devs))
+            {
+                // look for hash rate
+                $elapsed=intval($devs[$i]["Device Elapsed"]);
+
+                if (array_key_exists("MHS 5m", $devs[$i])&&array_key_exists("MHS 15m", $devs[$i]))
+                {
+                    if ($elapsed < 5 * 60)
+                    {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 5s"];
+                    }
+                    else if ($elapsed < 15 * 60)
+                    {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 1m"];
+                    }
+                    else if ($elapsed < 60 * 60)
+                    {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 5m"];
+                    }
+                    else
+                    {
+                        $devs[$i]["Hash Rate"] = $devs[$i]["MHS 15m"];
+                    }
+                }
+                else
+                {
+                    $devs[$i]["Hash Rate"] = $devs[$i]["MHS av"];
+                }
+
+                //total hash
+                $total_hash_rate += $devs[$i]["Hash Rate"];
+
+                //temp
+                $chain_rate[$i]["Average Temp"] = $devs[$i]["Temperature"];
+
+                //new display
+                $new_display = getHashRateShow($devs[$i]["Hash Rate"]);
+                $chain_rate[$i]["Hash Rate"] = $new_display['cal_hash'];
+                $chain_rate[$i]["Unit"] = $new_display['unit'];
+                $chain_rate[$i]["Hash Rate H"] = (int)$new_display['hash_rate'];
+
+                //fan speed
+                if (isset($response["stats"][0]["STATS"])&&array_key_exists($i,$response["stats"][0]["STATS"]))
+                {
+                    $stats = $response["stats"][0]["STATS"][$i];
+                    if ($fansSpeed==0&&intval($stats["Fan duty"]) > 0)
+                    {
+                        $fansSpeed = intval($stats["Fan duty"]);
+                    }
+
+                    $chain_rate[$i]["ASC"]  = $i;
+                    $chain_rate[$i]["Temp max"] = $stats["Temp max"];
+                }
+            }
+        }
+        // 2.4 total hash
+        $total_hash_show = getHashRateShow($total_hash_rate);
+        $total_hash['Hash Rate'] = $total_hash_show['cal_hash'];
+        $total_hash['Unit'] = $total_hash_show['unit'];
+        $total_hash['Hash Rate H'] = (int)$total_hash_show['hash_rate'];
+
+        $versions = getVersions();
+        // 3. mac address        
+        $mac = $versions['ethaddr'];
+
+        // 4. hwver
+        $hwver = $versions['hwver'];
+
+        // 5. platform versions
+        $platform = $versions['platform_v'];
+
+        // 6. uptime
+        $uptime=trim(exec("uptime"));
+
+        // 7. network
+        $network=getNetwork();
+
+        // 8. performance mode
+        $running_mode = getAutoTuneConfig();
+
+        // 9. dna
+        $dna = getDNA_common();
+
+        // 10. pools
+        $pools=@$response["pools"][0]["POOLS"];
+        if(is_array($pools))
+        {
+            global $config;
+            $configContent=@file_get_contents($config["configFile"]);
+            if ($configContent!=null&&$configContent!="")
+            {
+                $this->config = json_decode($configContent, true);
+            }
+            $pools_config = $this->config['pools'];
+
+            //temp arr
+            $temp_arr = array();
+            foreach ($pools as $key => $value) 
+            {
+                $pools_return[$key]['url'] = $value['URL'];
+                $pools_return[$key]['user'] = $value['User'];
+                $pools_return[$key]['password'] = $pools_config[$key]['pass'];
+                if($value['Stratum Active'])
+                {
+                    $temp_arr = $pools_return[$key];
+                    unset($pools_return[$key]);
+                }
+            }
+            array_unshift($pools_return, $temp_arr);
+        }        
+
+        $return_arr = array(
+            "type"          =>  $miner_type,
+            "chain"         =>  $chain_rate,
+            "fansSpeed"     =>  $fansSpeed,
+            "total_hash"    =>  $total_hash,
+            "mac"           =>  $mac,
+            "hwver"         =>  $hwver,
+            "platform"      =>  $platform,
+            "uptime"        =>  $uptime,
+            "network"       =>  $network,
+            "running_mode"  =>  $running_mode,
+            "dna"           =>  $dna,
+            "pools"         =>  $pools_return
+
+        );
+        echo json_encode(array("success"=>true,"all"=>$return_arr));
+        // echo json_encode(array("time2"=>microtime()));
     }
 }

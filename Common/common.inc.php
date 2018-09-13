@@ -530,3 +530,13 @@ function writerecord($src,$section,$before,$after)
     }
 
 }
+
+/**
+ * get dna info common func
+ */
+function getDNA_common()
+{
+    $dna_info = "";
+    $dna_info = exec("cat /sys/class/misc/dna/dna",$output,$return_var);
+    return $dna_info;
+}

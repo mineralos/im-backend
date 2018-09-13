@@ -134,6 +134,9 @@ if (!is_null($loggedUser)&&$loggedUser==$config["userAdmin"]) {
 
     //get dna
     $router->get('/api/getDNA', 'Status','getDNA');
+
+    //get all info api
+    $router->get('/api/getAll', 'Status','getAll');
     /*
      * Interface with the old API
      */
