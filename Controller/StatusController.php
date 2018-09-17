@@ -133,11 +133,11 @@ class StatusController {
                         $board = array();
                         $chips = array();
                         foreach ($stat as $key => $item) {
-                            $firstTwoDigits = substr($key, 0, 2);
-                            if (!is_numeric($firstTwoDigits)) {//Is board info
+                            $firstThreeDigits = trim(substr($key, 0, 3));
+                            if (!is_numeric($firstThreeDigits)) {//Is board info
                                 $board[$key] = $item;
                             } else { //is chip info
-                                $chips[intval($firstTwoDigits)][substr($key, 3)] = $item;
+                                $chips[intval($firstThreeDigits)][substr($key, strpos($key, " ")+1)] = $item;
                             }
                         }
                         $stats[] = array("board" => $board, "chips" => $chips);
