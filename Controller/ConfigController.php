@@ -39,20 +39,30 @@ class ConfigController {
         $keysNeeded=array("Pool","UserName","Password");
         $newKeys=array("url","user","pass");
         $pools=array();
-        for ($i=1;$i<=3;$i++) {
+        for ($i=1;$i<=3;$i++)
+        {
             $pool=array();
-            foreach ($keysNeeded as $j=>$key) {
+            foreach ($keysNeeded as $j=>$key)
+            {
                 $val=null;
-                if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="") {
+                if (array_key_exists($key . $i, $_POST)&&!is_null($_POST[$key . $i])&&$_POST[$key . $i]!="")
+                {
                     $val=$_POST[$key . $i];
                 }
-                if (is_null($val)) {
+                if (is_null($val))
+                {
                     $val="";
                 }
                 $pool[$newKeys[$j]]=$val;
             }
             if ($pool["url"]!=""&&$pool["user"]!=""&&$pool["pass"]!="")
+            {
+                if(!isUrlValid($pool["url"]))
+                {
+                    exit(json_encode(array("success"=>false,"message"=>"url error")));
+                }
                 $pools[]=$pool;
+            }
             /*****set record******/
             writerecord($_POST,'pool'.$i,stripslashes(json_encode($this->config["pools"][$i-1])),stripslashes(json_encode($pools[$i-1])));
             /*****set record******/
